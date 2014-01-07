@@ -165,6 +165,8 @@ public class BindingClassGenerator {
 			this.queue.log("Saved " + gc.getFullClassNameWithoutGeneric());
 		} catch (IOException io) {
 			getMessager().printMessage(Kind.ERROR, io.getMessage(), this.element);
+		} catch (NullPointerException npe) {
+			throw npe;
 		}
 	}
 
