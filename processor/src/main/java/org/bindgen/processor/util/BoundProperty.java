@@ -32,8 +32,6 @@ public class BoundProperty {
 	private final boolean isArray;
 	private ClassName name;
 
-	//private final TypeMirror typeInContext;
-
 	/**
 	 * @param enclosed the parent method or field
 	 * @param type our type
@@ -44,7 +42,6 @@ public class BoundProperty {
 		this.propertyName = propertyName;
 
 		type = Util.resolveTypeVarIfPossible(getTypeUtils(), outerElement, type).type;
-		//this.typeInContext = CurrentEnv.getTypeUtils().asMemberOf((DeclaredType) outerElement.asType(), ((DeclaredType) type).asElement());
 		this.isArray = type.getKind() == TypeKind.ARRAY;
 		// if we're an array, keep the primitive type, e.g. char[]
 		this.type = this.isArray ? type : Util.boxIfNeeded(type);
