@@ -137,7 +137,7 @@ public class BindKeywordGenerator {
 	private void writeBindKeywordClass() {
 		try {
 			this.queue.log("WRITING " + CLASS_NAME + ".java");
-			JavaFileObject jfo = getFiler().createSourceFile(this.bindClass.getSimpleName());
+			JavaFileObject jfo = getFiler().createSourceFile(this.bindClass.getFullName());
 			Writer w = jfo.openWriter();
 			w.write(this.bindClass.toCode());
 			w.close();

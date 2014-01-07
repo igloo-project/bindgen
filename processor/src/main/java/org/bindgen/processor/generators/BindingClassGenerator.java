@@ -157,11 +157,11 @@ public class BindingClassGenerator {
 
 	private void saveCode(GClass gc) {
 		try {
-			JavaFileObject jfo = getFiler().createSourceFile(gc.getSimpleName(), Copy.array(Element.class, Copy.list(this.sourceElements)));
+			JavaFileObject jfo = getFiler().createSourceFile(gc.getFullName(), Copy.array(Element.class, Copy.list(this.sourceElements)));
 			Writer w = jfo.openWriter();
 			w.write(gc.toCode());
 			w.close();
-			this.queue.log("Saved " + gc.getSimpleName());
+			this.queue.log("Saved " + gc.getFullName());
 		} catch (IOException io) {
 			getMessager().printMessage(Kind.ERROR, io.getMessage(), this.element);
 		} catch (NullPointerException npe) {
