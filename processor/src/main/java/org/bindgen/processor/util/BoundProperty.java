@@ -3,7 +3,9 @@ package org.bindgen.processor.util;
 import static org.bindgen.processor.CurrentEnv.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -103,15 +105,21 @@ public class BoundProperty {
 				// the user declared wildcards, e.g. "public Foo<?> foo", but
 				// our MyFoo inner class can't use wildcards in the declaration,
 				// so we make up dummy Ux type parameters and s/?/Ux
+
+				// First pass: work out what the dummy type names will be for the existing wildcards.
 				int wildcardIndex = 0;
+				Map<TypeMirror, String> dummyTypes = new HashMap<TypeMirror, String>();
+				List<WildcardTypeData> wildcardList = new ArrayList<WildcardTypeData>();
 				for (TypeMirror tm : ((DeclaredType) this.type).getTypeArguments()) {
 					final String dummyParam = "U" + (wildcardIndex);
+					TypeMirror relevantType = null;
 					if (tm.getKind() == TypeKind.WILDCARD) {
+						WildcardTypeData wildcard = new WildcardTypeData(dummyParam);
 						WildcardType wt = (WildcardType) tm;
-						String suffix = "";
 						if (wt.getExtendsBound() != null) {
 							// the user declared their own bounds, e.g. "public Foo<? extends Foo<?>> foo"
-							suffix += " extends " + wt.getExtendsBound().toString();
+							relevantType = wt.getExtendsBound();
+							wildcard = new WildcardTypeData(dummyParam, wt.getExtendsBound());
 						} else {
 							// get Foo<?>'s declared type, and copy over its type parameters
 							// and their bounds, replacing ? with our U0
@@ -120,15 +128,34 @@ public class BoundProperty {
 								List<? extends TypeParameterElement> tpes = ((TypeElement) e).getTypeParameters();
 								if (tpes.size() > wildcardIndex) {
 									TypeParameterElement tp = tpes.get(wildcardIndex);
+									relevantType = tp.asType();
 									if (tp.getBounds().size() > 0) {
-										suffix += " extends " + toStringWithDummyParam(tp.getBounds().get(0), tp.asType(), dummyParam);
+										wildcard = new WildcardTypeData(dummyParam, tp);
 									}
 								}
 							}
 						}
-						dummyParams.add(dummyParam + suffix);
+						dummyTypes.put(relevantType, dummyParam);
+						wildcardList.add(wildcard);
 						wildcardIndex++;
 					}
+				}
+
+				// Second pass: work out the 'extends' suffix for each dummy param.
+				for (WildcardTypeData wildcard : wildcardList) {
+					String suffix = "";
+					if (wildcard.extendsBound != null) {
+						// the user declared their own bounds, e.g. "public Foo<? extends Foo<?>> foo"
+						suffix += " extends " + wildcard.extendsBound.toString();
+					} else if (wildcard.wildcardParameter != null) {
+						suffix += " extends "
+							+ toStringWithDummyParam(
+								wildcard.wildcardParameter.getBounds().get(0),
+								wildcard.wildcardParameter.asType(),
+								wildcard.dummyParam,
+								dummyTypes);
+					}
+					dummyParams.add(wildcard.dummyParam + suffix);
 				}
 			}
 			if (dummyParams.size() > 0) {
@@ -339,13 +366,14 @@ public class BoundProperty {
 		return this.name.getWithoutGenericPart();
 	}
 
-	/** @return the toString of {@code tm} with {@code tp} replaced by {@code dummyParameter} */
-	private static String toStringWithDummyParam(TypeMirror tm, TypeMirror tp, String dummyParameter) {
+	/** @param dummyTypes
+	 * @return the toString of {@code tm} with {@code tp} replaced by {@code dummyParameter} */
+	private static String toStringWithDummyParam(TypeMirror tm, TypeMirror tp, String dummyParameter, Map<TypeMirror, String> dummyTypes) {
 		if (tm.getKind() == TypeKind.DECLARED) {
 			DeclaredType dt = (DeclaredType) tm;
 			List<String> params = new ArrayList<String>();
 			for (TypeMirror ta : dt.getTypeArguments()) {
-				params.add(toStringWithDummyParam(ta, tp, dummyParameter));
+				params.add(toStringWithDummyParam(ta, tp, dummyParameter, dummyTypes));
 			}
 			if (params.size() == 0) {
 				return tm.toString();
@@ -356,7 +384,31 @@ public class BoundProperty {
 		if (getTypeUtils().isSameType(tm, tp)) {
 			return dummyParameter;
 		}
-		return tm.toString();
+		String existingDummy = dummyTypes.get(tm);
+		return existingDummy == null ? tm.toString() : existingDummy;
 	}
 
+	private static class WildcardTypeData {
+		public final String dummyParam;
+		public final TypeMirror extendsBound;
+		public final TypeParameterElement wildcardParameter;
+
+		public WildcardTypeData(String dummyParam) {
+			this(dummyParam, null, null);
+		}
+
+		public WildcardTypeData(String dummyParam, TypeMirror extendsBound) {
+			this(dummyParam, extendsBound, null);
+		}
+
+		public WildcardTypeData(String dummyParam, TypeParameterElement wildcardParameter) {
+			this(dummyParam, null, wildcardParameter);
+		}
+
+		private WildcardTypeData(String dummyParam, TypeMirror extendsBound, TypeParameterElement wildcardParameter) {
+			this.dummyParam = dummyParam;
+			this.extendsBound = extendsBound;
+			this.wildcardParameter = wildcardParameter;
+		}
+	}
 }
