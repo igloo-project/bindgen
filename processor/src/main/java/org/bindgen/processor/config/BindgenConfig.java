@@ -1,5 +1,7 @@
 package org.bindgen.processor.config;
 
+import static org.bindgen.processor.CurrentEnv.getConfig;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,6 +13,7 @@ import org.bindgen.binding.AbstractBinding;
 import org.bindgen.processor.CurrentEnv;
 import org.bindgen.processor.util.ClassName;
 import org.bindgen.processor.util.ConfUtil;
+import org.bindgen.processor.util.Util;
 
 /**
  * Bindgen configuration.
@@ -39,6 +42,25 @@ public class BindgenConfig {
 
 	public boolean shouldGenerateBindingFor(ClassName name) {
 		return this.bindingScope.includes(name);
+	}
+
+	/**
+	 * Check if a type binding already exists. Allow to use bindings from dependencies.
+	 * 
+	 * @param name - type name to search
+	 * @param element - enclosing element
+	 * @return true if a ...BindingPath already exists
+	 */
+	public boolean existsFieldTypeBindingFor(ClassName name, Element element) {
+		String bindingPathClassName = Util.lowerCaseOuterClassNames(element, getConfig().baseNameForBinding(name) + "BindingPath");
+		try {
+			Class.forName(bindingPathClassName);
+			return true;
+		} catch (ClassNotFoundException e) {
+			return false;
+		} catch (NoClassDefFoundError e) {
+			return false;
+		}
 	}
 
 	public boolean logEnabled() {
