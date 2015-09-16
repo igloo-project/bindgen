@@ -46,7 +46,14 @@
 			<url>http://repo.joist.ws/</url>
 		</repository>
 	</repositories>
-	
+
+	<scm>
+		<url>git@github.com:openwide-java/bindgen.git</url>
+		<connection>scm:git:git@github.com:openwide-java/bindgen.git</connection>
+		<developerConnection>scm:git:git@github.com:openwide-java/bindgen.git</developerConnection>
+		<tag>HEAD</tag>
+	</scm>
+
 	<profiles>
 		<profile>
 			<activation>
