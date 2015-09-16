@@ -4,7 +4,7 @@
 	
 	<artifactId>bindgen</artifactId>
 	<groupId>org.bindgen</groupId>
-	<version>2.25-ow-SNAPSHOT</version>
+	<version>2.24-ow-SNAPSHOT</version>
 	
 	<name>Bindgen</name>
 
@@ -58,7 +58,6 @@
 		<url>git@github.com:openwide-java/bindgen.git</url>
 		<connection>scm:git:git@github.com:openwide-java/bindgen.git</connection>
 		<developerConnection>scm:git:git@github.com:openwide-java/bindgen.git</developerConnection>
-		<tag>HEAD</tag>
 	</scm>
 
 	<profiles>
