@@ -8,4 +8,4 @@ addons:
 cache:
   directories:
     - $HOME/.m2
-script: mvn -U -Ptravis clean package
+script: mvn -U clean package
