@@ -18,15 +18,16 @@ import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic.Kind;
 import javax.tools.JavaFileObject;
 
-import joist.sourcegen.GClass;
-import joist.sourcegen.GMethod;
-import joist.util.Copy;
-
 import org.bindgen.Binding;
+import org.bindgen.BindingRoot;
 import org.bindgen.processor.GenerationQueue;
 import org.bindgen.processor.Processor;
 import org.bindgen.processor.util.BoundClass;
 import org.bindgen.processor.util.Util;
+
+import joist.sourcegen.GClass;
+import joist.sourcegen.GMethod;
+import joist.util.Copy;
 
 /** Generates a <code>XxxBinding</code> class for a given {@link TypeElement}.
  *
@@ -57,7 +58,7 @@ public class BindingClassGenerator {
 
 	public void generate() {
 		this.initializePathBindingClass();
-		this.addGetName();
+		this.addPathBindingConstructors();
 		this.addGetType();
 		this.addProperties();
 		this.addGetChildBindings();
@@ -74,9 +75,9 @@ public class BindingClassGenerator {
 	}
 
 	private void initializePathBindingClass() {
-		this.pathBindingClass = new GClass(this.name.getBindingPathClassDeclaration());
-		this.pathBindingClass.baseClassName(this.name.getBindingPathClassSuperClass());
-		this.pathBindingClass.setAbstract();
+		this.pathBindingClass = new GClass(this.name.getBindingPathClassDeclaration("R"));
+		this.pathBindingClass.addImports(BindingRoot.class);
+		this.pathBindingClass.baseClassName(this.name.getBindingPathClassSuperClass("R"));
 		this.pathBindingClass.addAnnotation("@SuppressWarnings(\"all\")");
 	}
 
@@ -106,6 +107,19 @@ public class BindingClassGenerator {
 		this.pathBindingClass.addAnnotation("@Generated(value = \"" + value + "\", date = \"" + date + "\")");
 		this.rootBindingClass.addImports(Generated.class);
 		this.rootBindingClass.addAnnotation("@Generated(value = \"" + value + "\", date = \"" + date + "\")");
+	}
+
+	private void addPathBindingConstructors() {
+		this.pathBindingClass.getConstructor();
+		this.pathBindingClass.getConstructor("BindingRoot<R, ?> parentBinding",
+				"Class<?> parentType",
+				// TODO: comment traiter les génériques ?
+				"Class<" + this.name.get() + "> targetType",
+				"String propertyName",
+				"String fieldName",
+				"String getMethod",
+				"String setMethod")
+		.body.line("super(parentBinding, parentType, targetType, propertyName, fieldName, getMethod, setMethod);");
 	}
 
 	private void addConstructors() {
@@ -174,7 +188,7 @@ public class BindingClassGenerator {
 		List<PropertyGenerator.GeneratorFactory> factories = new ArrayList<PropertyGenerator.GeneratorFactory>();
 		// these bindings will not mangle their property names
 		factories.add(new MethodPropertyGenerator.Factory(AccessorPrefix.NONE));
-		factories.add(new MethodCallableGenerator.Factory());
+//		factories.add(new MethodCallableGenerator.Factory());
 		// these bindings will try to drop their prefix and use a shorter name (e.g. getFoo -> foo)
 		factories.add(new MethodPropertyGenerator.Factory(AccessorPrefix.GET));
 		factories.add(new MethodPropertyGenerator.Factory(AccessorPrefix.HAS));

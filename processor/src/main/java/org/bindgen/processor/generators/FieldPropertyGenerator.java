@@ -7,19 +7,21 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 
+import org.bindgen.ContainerBinding;
+import org.bindgen.processor.util.BoundProperty;
+import org.bindgen.processor.util.ClassName;
+import org.bindgen.processor.util.Util;
+
 import joist.sourcegen.GClass;
 import joist.sourcegen.GMethod;
 
-import org.bindgen.ContainerBinding;
-import org.bindgen.processor.util.BoundProperty;
-import org.bindgen.processor.util.Util;
-
 /**
- * Generates bindings for fields 
+ * Generates bindings for fields
  */
 public class FieldPropertyGenerator implements PropertyGenerator {
 
 	private final GClass outerClass;
+	private final TypeElement outerElement;
 	private final Element field;
 	private final String fieldName;
 	private final BoundProperty property;
@@ -28,6 +30,7 @@ public class FieldPropertyGenerator implements PropertyGenerator {
 
 	public FieldPropertyGenerator(GClass outerClass, TypeElement outerElement, Element field, String propertyName) throws WrongGeneratorException {
 		this.outerClass = outerClass;
+		this.outerElement = outerElement;
 		this.field = field;
 		this.fieldName = this.field.getSimpleName().toString();
 
@@ -46,17 +49,17 @@ public class FieldPropertyGenerator implements PropertyGenerator {
 	public void generate() {
 		this.addOuterClassGet();
 		this.addOuterClassBindingField();
-		this.addInnerClass();
-		this.addInnerClassGetName();
-		this.addInnerClassGetParent();
-		this.addInnerClassGet();
-		this.addInnerClassGetWithRoot();
-		this.addInnerClassGetSafelyWithRoot();
-		this.addInnerClassSet();
-		this.addInnerClassSetWithRoot();
-		this.addInnerClassGetContainedTypeIfNeeded();
-		this.addInnerClassSerialVersionUID();
-		this.addInnerClassIsReadOnlyOverrideIfNeeded();
+//		this.addInnerClass();
+//		this.addInnerClassGetName();
+//		this.addInnerClassGetParent();
+//		this.addInnerClassGet();
+//		this.addInnerClassGetWithRoot();
+//		this.addInnerClassGetSafelyWithRoot();
+//		this.addInnerClassSet();
+//		this.addInnerClassSetWithRoot();
+//		this.addInnerClassGetContainedTypeIfNeeded();
+//		this.addInnerClassSerialVersionUID();
+//		this.addInnerClassIsReadOnlyOverrideIfNeeded();
 	}
 
 	private void addOuterClassBindingField() {
@@ -68,7 +71,18 @@ public class FieldPropertyGenerator implements PropertyGenerator {
 		fieldGet.setAccess(Util.getAccess(this.field));
 		fieldGet.returnType(this.property.getBindingClassFieldDeclaration());
 		fieldGet.body.line("if (this.{} == null) {", this.property.getName());
-		fieldGet.body.line("    this.{} = new {}();", this.property.getName(), this.property.getBindingRootClassInstantiation());
+		fieldGet.body.line("    this.{} = new {}({}, (Class<{}>)(Object) {}, (Class<{}>)(Object) {}, {}, {}, {}, {});",
+				this.property.getName(),
+				this.property.getBindingRootClassInstantiation(),
+				"this",
+				this.outerElement.asType().toString(),
+				new ClassName(this.outerElement.getQualifiedName().toString()).getWithoutGenericPart() + ".class",
+				this.property.getType().toString(),
+				new ClassName(this.property.getType().toString()).getWithoutGenericPart() + ".class",
+				"\"" + this.property.getName() + "\"",
+				"\"" + this.fieldName + "\"",
+				"null",
+				"null");
 		fieldGet.body.line("}");
 		fieldGet.body.line("return this.{};", this.property.getName());
 	}

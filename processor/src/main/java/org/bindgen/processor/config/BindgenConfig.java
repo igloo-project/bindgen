@@ -9,7 +9,7 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 
-import org.bindgen.binding.AbstractBinding;
+import org.bindgen.binding.AbstractReflectBinding;
 import org.bindgen.processor.CurrentEnv;
 import org.bindgen.processor.util.ClassName;
 import org.bindgen.processor.util.ConfUtil;
@@ -187,7 +187,7 @@ public class BindgenConfig {
 		this.options.put("skipAttribute.java.lang.Object.getClass", "true");
 		this.options.put("skipAttribute.java.lang.Object.notify", "true");
 		this.options.put("skipAttribute.java.lang.Object.notifyAll", "true");
-		this.options.put("bindingPathSuperClass", AbstractBinding.class.getName());
+		this.options.put("bindingPathSuperClass", AbstractReflectBinding.class.getName());
 	}
 
 	private void loadBindgenDotProperties(ProcessingEnvironment env) {

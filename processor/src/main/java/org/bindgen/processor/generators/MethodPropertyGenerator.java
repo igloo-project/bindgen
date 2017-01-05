@@ -15,13 +15,15 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 
-import joist.sourcegen.GClass;
-import joist.sourcegen.GMethod;
-
 import org.bindgen.ContainerBinding;
 import org.bindgen.processor.CurrentEnv;
 import org.bindgen.processor.util.BoundProperty;
+import org.bindgen.processor.util.ClassName;
 import org.bindgen.processor.util.Util;
+
+import joist.sourcegen.GClass;
+import joist.sourcegen.GMethod;
+import joist.util.Join;
 
 /** Generates bindings for method properties like getFoo/setFoo, foo/foo(), with setters being optional. */
 public class MethodPropertyGenerator implements PropertyGenerator {
@@ -55,22 +57,6 @@ public class MethodPropertyGenerator implements PropertyGenerator {
 	public void generate() {
 		this.addOuterClassGet();
 		this.addOuterClassBindingField();
-		this.addInnerClass();
-		this.addInnerClassGetName();
-		this.addInnerClassParent();
-		this.addInnerClassGet();
-		this.addInnerClassGetWithRoot();
-		this.addInnerClassGetSafelyWithRoot();
-		if (this.hasSetterMethod()) {
-			this.addInnerClassSet();
-			this.addInnerClassSetWithRoot();
-		} else {
-			this.addReadOnlyInnerClassSet();
-			this.addReadOnlyInnerClassSetWithRoot();
-			this.addInnerClassIsReadOnlyOverride();
-		}
-		this.addInnerClassGetContainedTypeIfNeeded();
-		this.addInnerClassSerialVersionUID();
 	}
 
 	private boolean hasSetterMethod() {
@@ -113,11 +99,38 @@ public class MethodPropertyGenerator implements PropertyGenerator {
 	}
 
 	private void addOuterClassGet() {
-		GMethod fieldGet = this.outerClass.getMethod(this.property.getName() + "()");
+		GMethod fieldGet = this.outerClass.getMethod(this.property.getName() + "()").typeParameters(this.property.getMethodParams());
 		fieldGet.setAccess(Util.getAccess(this.method));
 		fieldGet.returnType(this.property.getBindingClassFieldDeclaration());
 		fieldGet.body.line("if (this.{} == null) {", this.property.getName());
-		fieldGet.body.line("    this.{} = new {}();", this.property.getName(), this.property.getBindingRootClassInstantiation());
+		String setMethod = null;
+		if (this.hasSetterMethod()) {
+			setMethod = this.prefix.setterName(this.methodName);
+		}
+		String targetType;
+		if (this.property.getGenericElement() != null) {
+			targetType = this.property.getGenericElement().getBounds().get(0).toString();
+		} else {
+			targetType = this.property.getType().toString();
+		}
+		String targetTypeWithGenerics;
+		if (!this.property.getMethodParamsList(false).isEmpty()) {
+			targetTypeWithGenerics = new ClassName(this.property.getType().toString()).getWithoutGenericPart() + "<" + Join.commaSpace(this.property.getMethodParamsList(false)) + ">";
+		} else {
+			targetTypeWithGenerics = this.property.getType().toString();
+		}
+		fieldGet.body.line("    this.{} = new {}({}, (Class<{}>)(Object) {}, (Class<{}>)(Object){}, {}, {}, {}, {});",
+				this.property.getName(),
+				this.property.getBindingRootClassInstantiation(),
+				"this",
+				this.outerElement.asType().toString(),
+				new ClassName(this.outerElement.getQualifiedName().toString()).getWithoutGenericPart() + ".class",
+				targetTypeWithGenerics,
+				new ClassName(targetType).getWithoutGenericPart() + ".class",
+				"\"" + this.property.getName() + "\"",
+				"null",
+				"\"" + this.methodName + "\"",
+				setMethod != null ? "\"" + setMethod + "\"" : "null");
 		fieldGet.body.line("}");
 		fieldGet.body.line("return this.{};", this.property.getName());
 	}
@@ -127,15 +140,15 @@ public class MethodPropertyGenerator implements PropertyGenerator {
 	}
 
 	private void addInnerClass() {
-		this.innerClass = this.outerClass.getInnerClass(this.property.getInnerClassDeclaration()).notStatic();
-		this.innerClass.setAccess(Util.getAccess(this.method));
-		this.innerClass.baseClassName(this.property.getInnerClassSuperClass());
-		if (this.property.isForGenericTypeParameter() || this.property.isArray()) {
-			this.innerClass.getMethod("getType").returnType("Class<?>").body.line("return null;");
-		} else if (!this.property.shouldGenerateBindingClassForType()) {
-			// since no binding class will be generated for the return type of this method we may not inherit getType() in MyBinding class (if, for example, MyBinding extends GenericObjectBindingPath) and so we have to implement it ouselves
-			this.innerClass.getMethod("getType").returnType("Class<?>").body.line("return {}.class;", this.property.getReturnableType());
-		}
+//		this.innerClass = this.outerClass.getInnerClass(this.property.getInnerClassDeclaration()).notStatic();
+//		this.innerClass.setAccess(Util.getAccess(this.method));
+//		this.innerClass.baseClassName(this.property.getInnerClassSuperClass());
+//		if (this.property.isForGenericTypeParameter() || this.property.isArray()) {
+//			this.innerClass.getMethod("getType").returnType("Class<?>").body.line("return null;");
+//		} else if (!this.property.shouldGenerateBindingClassForType()) {
+//			// since no binding class will be generated for the return type of this method we may not inherit getType() in MyBinding class (if, for example, MyBinding extends GenericObjectBindingPath) and so we have to implement it ouselves
+//			this.innerClass.getMethod("getType").returnType("Class<?>").body.line("return {}.class;", this.property.getReturnableType());
+//		}
 	}
 
 	private void addInnerClassGetName() {

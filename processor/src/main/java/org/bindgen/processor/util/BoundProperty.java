@@ -16,12 +16,12 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.WildcardType;
 
+import org.bindgen.binding.AbstractReflectBinding;
+import org.bindgen.processor.CurrentEnv;
+
 import joist.util.Copy;
 import joist.util.Inflector;
 import joist.util.Join;
-
-import org.bindgen.binding.GenericObjectBindingPath;
-import org.bindgen.processor.CurrentEnv;
 
 /** Given a TypeMirror type of a field/method property, provides information about its binding outer/inner class. */
 public class BoundProperty {
@@ -82,7 +82,7 @@ public class BoundProperty {
 	}
 
 	public String getBindingRootClassInstantiation() {
-		return "My" + Inflector.capitalize(this.propertyName) + "Binding" + this.optionalGenericsIfWildcards(null);
+		return this.getInnerClassSuperClass(false);
 	}
 
 	public String getBindingClassFieldDeclaration() {
@@ -91,6 +91,100 @@ public class BoundProperty {
 
 	public String getInnerClassSuperClass() {
 		return this.getInnerClassSuperClass(false);
+	}
+
+	public List<String> getMethodParamsList(boolean replaceWildcards) {
+		List<String> typeArgs = new ArrayList<String>();
+		if (this.isRawType()) {
+			for (TypeParameterElement tpe : this.getElement().getTypeParameters()) {
+				typeArgs.add(replaceWildcards ? "?" : tpe.toString());
+			}
+		} else if (this.isFixingRawType) {
+			typeArgs.add(this.name.getGenericPartWithoutBrackets());
+		} else if (this.type.getKind() == TypeKind.DECLARED) {
+			int wildcardIndex = 0;
+			for (TypeMirror tm : ((DeclaredType) this.type).getTypeArguments()) {
+				if (tm.getKind() == TypeKind.WILDCARD) {
+					typeArgs.add(replaceWildcards ? "?" : ("U" + wildcardIndex++));
+				} else {
+					typeArgs.add(tm.toString());
+				}
+			}
+		}
+		return typeArgs;
+	}
+
+	public String getMethodParams() {
+		if (this.type.getKind() == TypeKind.DECLARED) {
+			List<String> dummyParams = new ArrayList<String>();
+			if (this.isRawType()) {
+				for (TypeParameterElement tpe : this.getElement().getTypeParameters()) {
+					dummyParams.add(tpe.toString());
+				}
+			} else {
+				// the user declared wildcards, e.g. "public Foo<?> foo", but
+				// our MyFoo inner class can't use wildcards in the declaration,
+				// so we make up dummy Ux type parameters and s/?/Ux
+
+				// First pass: work out what the dummy type names will be for the existing wildcards.
+				int wildcardIndex = 0;
+				Map<TypeMirror, String> dummyTypes = new HashMap<TypeMirror, String>();
+				List<WildcardTypeData> wildcardList = new ArrayList<WildcardTypeData>();
+				for (TypeMirror tm : ((DeclaredType) this.type).getTypeArguments()) {
+					final String dummyParam = "U" + (wildcardIndex);
+					TypeMirror relevantType = null;
+					if (tm.getKind() == TypeKind.WILDCARD) {
+						WildcardTypeData wildcard = new WildcardTypeData(dummyParam);
+						WildcardType wt = (WildcardType) tm;
+						if (wt.getExtendsBound() != null) {
+							// the user declared their own bounds, e.g. "public Foo<? extends Foo<?>> foo"
+							relevantType = wt.getExtendsBound();
+							wildcard = new WildcardTypeData(dummyParam, wt.getExtendsBound());
+						} else {
+							// get Foo<?>'s declared type, and copy over its type parameters
+							// and their bounds, replacing ? with our U0
+							Element e = ((DeclaredType) this.type).asElement();
+							if (e instanceof TypeElement) {
+								List<? extends TypeParameterElement> tpes = ((TypeElement) e).getTypeParameters();
+								if (tpes.size() > wildcardIndex) {
+									TypeParameterElement tp = tpes.get(wildcardIndex);
+									relevantType = tp.asType();
+									if (tp.getBounds().size() > 0) {
+										wildcard = new WildcardTypeData(dummyParam, tp);
+									}
+								}
+							}
+						}
+						dummyTypes.put(relevantType, dummyParam);
+						wildcardList.add(wildcard);
+						wildcardIndex++;
+					}
+				}
+
+				// Second pass: work out the 'extends' suffix for each dummy param.
+				for (WildcardTypeData wildcard : wildcardList) {
+					String suffix = "";
+					if (wildcard.extendsBound != null) {
+						// the user declared their own bounds, e.g. "public Foo<? extends Foo<?>> foo"
+						suffix += " extends " + wildcard.extendsBound.toString();
+					} else if (wildcard.wildcardParameter != null) {
+						suffix += " extends "
+							+ toStringWithDummyParam(
+								wildcard.wildcardParameter.getBounds().get(0),
+								wildcard.wildcardParameter.asType(),
+								wildcard.dummyParam,
+								dummyTypes);
+					}
+					dummyParams.add(wildcard.dummyParam + suffix);
+				}
+			}
+			if (!dummyParams.isEmpty()) {
+				return Join.commaSpace(dummyParams);
+			} else {
+				return null;
+			}
+		}
+		return null;
 	}
 
 	public String getInnerClassDeclaration() {
@@ -177,39 +271,35 @@ public class BoundProperty {
 	private String getInnerClassSuperClass(boolean replaceWildcards) {
 		// Arrays don't have individual binding classes
 		if (this.isArray()) {
-			return getConfig().bindingPathSuperClassName() + "<R, " + this.type.toString() + ">";
+			List<String> args = new ArrayList<String>();
+			args.add("R");
+			args.add(this.type.toString());
+			return getConfig().bindingPathSuperClassName() + "<" + Join.commaSpace(args) + ">";
 		}
 		// Being a generic type, we have no XxxBindingPath to extend, so just extend AbstractBinding directly
 		if (this.isForGenericTypeParameter()) {
-			return getConfig().bindingPathSuperClassName() + "<R, " + this.getGenericElement() + ">";
+			List<String> args = new ArrayList<String>();
+			args.add("R");
+			args.add(this.getGenericElement().toString());
+			return getConfig().bindingPathSuperClassName() + "<" + Join.commaSpace(args) + ">";
 		}
 
 		// if our type is outside the binding scope and no existing binding is available,
 		// we return a generic binding type
 		if (!this.shouldGenerateBindingClassForType()
-				&& !existsFieldTypeBindingFor() // check if type binding already exists ; if so, we can use it
+				// TODO TODO
+				// && !this.existsFieldTypeBindingFor() // check if type binding already exists ; if so, we can use it
 				) {
-			return GenericObjectBindingPath.class.getName() + "<R," + this.type.toString() + ">";
+			List<String> args = new ArrayList<String>();
+			args.add("R");
+			args.add(this.type.toString());
+			return AbstractReflectBinding.class.getName() + "<" + Join.commaSpace(args) + ">";
 		}
 
 		String superName = Util.lowerCaseOuterClassNames(this.element, getConfig().baseNameForBinding(this.name) + "BindingPath");
 		List<String> typeArgs = Copy.list("R");
-		if (this.isRawType()) {
-			for (TypeParameterElement tpe : this.getElement().getTypeParameters()) {
-				typeArgs.add(replaceWildcards ? "?" : tpe.toString());
-			}
-		} else if (this.isFixingRawType) {
-			typeArgs.add(this.name.getGenericPartWithoutBrackets());
-		} else if (this.type.getKind() == TypeKind.DECLARED) {
-			int wildcardIndex = 0;
-			for (TypeMirror tm : ((DeclaredType) this.type).getTypeArguments()) {
-				if (tm.getKind() == TypeKind.WILDCARD) {
-					typeArgs.add(replaceWildcards ? "?" : ("U" + wildcardIndex++));
-				} else {
-					typeArgs.add(tm.toString());
-				}
-			}
-		}
+		typeArgs.addAll(this.getMethodParamsList(replaceWildcards));
+
 		return superName + "<" + Join.commaSpace(typeArgs) + ">";
 	}
 

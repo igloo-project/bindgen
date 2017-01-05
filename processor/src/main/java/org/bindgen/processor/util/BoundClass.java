@@ -2,13 +2,14 @@ package org.bindgen.processor.util;
 
 import static org.bindgen.processor.CurrentEnv.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.lang.model.element.TypeElement;
 
-import joist.util.Join;
-
 import org.bindgen.processor.CurrentEnv;
+
+import joist.util.Join;
 
 /** Given a TypeMirror type of a field/method property, provides information about its binding outer/inner class. */
 public class BoundClass {
@@ -27,14 +28,17 @@ public class BoundClass {
 		return new ClassName(Util.lowerCaseOuterClassNames(this.element, bindingName));
 	}
 
-	public String getBindingPathClassDeclaration() {
+	public String getBindingPathClassDeclaration(String genericRootType) {
 		List<String> typeArgs = this.name.getGenericsWithBounds();
-		typeArgs.add(0, "R");
+		typeArgs.add(0, genericRootType);
 		return this.getBindingClassName().getWithoutGenericPart() + "Path" + "<" + Join.commaSpace(typeArgs) + ">";
 	}
 
-	public String getBindingPathClassSuperClass() {
-		return CurrentEnv.getConfig().bindingPathSuperClassName() + "<R, " + this.name.get() + ">";
+	public String getBindingPathClassSuperClass(String genericRootType) {
+		List<String> typeArgs = new ArrayList<String>();
+		typeArgs.add(genericRootType);
+		typeArgs.add(this.name.get());
+		return CurrentEnv.getConfig().bindingPathSuperClassName() + "<" + Join.commaSpace(typeArgs) + ">";
 	}
 
 	public String getBindingRootClassDeclaration() {
