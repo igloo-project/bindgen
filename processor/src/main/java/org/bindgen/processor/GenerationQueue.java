@@ -63,8 +63,8 @@ public class GenerationQueue {
 	 */
 	public void enqueueIfNew(TypeElement element) {
 		if (this.hasAlreadyBeenWrittenByThisCompilationRun(element)
-				|| this.hasAlreadyBeenWrittenByAPreviousCompilationRun(element) || getConfig()
-						.existsFieldTypeBindingFor(new ClassName(element.getQualifiedName().toString()), element)) {
+				|| this.hasAlreadyBeenWrittenByAPreviousCompilationRun(element)
+				|| getConfig().existsFieldTypeBindingFor(new ClassName(element.getQualifiedName().toString()), element)) {
 			return;
 		}
 		this.enqueue(element);
