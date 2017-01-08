@@ -4,7 +4,7 @@
 	
 	<artifactId>bindgen</artifactId>
 	<groupId>org.bindgen</groupId>
-	<version>2.29-ow-SNAPSHOT</version>
+	<version>3.0.0-SNAPSHOT</version>
 	
 	<name>Bindgen</name>
 
@@ -29,7 +29,7 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.3</version>
+				<version>3.6.0</version>
 				<configuration>
 					<source>1.7</source>
 					<target>1.7</target>
@@ -46,7 +46,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-release-plugin</artifactId>
-				<version>2.5.2</version>
+				<version>2.5.3</version>
 			</plugin>
 		</plugins>
 	</build>
