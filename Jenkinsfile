@@ -37,7 +37,7 @@ node{
         if (!versionSuffixes.isEmpty()) {
             versionSuffixDeclaration = '-Dversion.suffix=' + versionSuffixes.join('-')
         }
-        lock('owsiCore') {
+        lock('bindgen') {
             withMaven(jdk: 'JDK 1.8', maven: 'Maven 3.3.x') {
                 sh "mvn -DskipTests -Ddistribution=owsi-core-release ${versionSuffixDeclaration} ${toolchain} clean ${target}"
             }
