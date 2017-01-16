@@ -1,5 +1,4 @@
 node{
-    properties([])
     def jdkSuffix = ""
     def toolchain = ""
     // Mark the code checkout 'stage'....
