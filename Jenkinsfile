@@ -23,7 +23,8 @@ node{
         } else {
             target = 'package'
         }
-        if (env.BRANCH_NAME.contains('-') && env.BRANCH_NAME.split('-')[0] in ['feature', 'fix', 'hotfix']) {
+        // env.BRANCH_NAME null if tag
+        if (env.BRANCH_NAME && env.BRANCH_NAME.contains('-') && env.BRANCH_NAME.split('-')[0] in ['feature', 'fix', 'hotfix']) {
             branchSuffix = env.BRANCH_NAME.substring(env.BRANCH_NAME.indexOf('-') + 1)
         }
         List versionSuffixes = []
