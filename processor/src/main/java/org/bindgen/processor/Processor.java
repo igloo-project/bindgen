@@ -14,23 +14,26 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
+import javax.tools.Diagnostic.Kind;
 import javax.tools.FileObject;
 import javax.tools.StandardLocation;
-import javax.tools.Diagnostic.Kind;
 
 import org.bindgen.Bindable;
 
-/** A processor that generates type-safe binding classes for classes annotated with {@link Bindable}.
+/**
+ * A processor that generates type-safe binding classes for classes annotated
+ * with {@link Bindable}.
  *
  * There is one {@link Processor} created per compilation run. Within that run,
- * there are several rounds, with <code>process</code> being called for each round the compiler
- * decides this processor should be a part of.
+ * there are several rounds, with <code>process</code> being called for each
+ * round the compiler decides this processor should be a part of.
  *
- * For javac, there is one big compilation run with all classes. For Eclipse, there is one
- * initial large compilation run, and then many small compilation runs each time the user
- * hits save.
+ * For javac, there is one big compilation run with all classes. For Eclipse,
+ * there is one initial large compilation run, and then many small compilation
+ * runs each time the user hits save.
  *
- * See the processor <a href="http://java.sun.com/javase/6/docs/api/javax/annotation/processing/Processor.html">javadocs</a>
+ * See the processor <a href=
+ * "http://java.sun.com/javase/6/docs/api/javax/annotation/processing/Processor.html">javadocs</a>
  * for more details.
  */
 @SupportedAnnotationTypes({ "org.bindgen.Bindable" })
@@ -52,7 +55,8 @@ public class Processor extends AbstractProcessor {
 	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
 		try {
 			for (Element element : roundEnv.getElementsAnnotatedWith(Bindable.class)) {
-				if (element.getKind() == ElementKind.CLASS || element.getKind() == ElementKind.INTERFACE || element.getKind() == ElementKind.ENUM) {
+				if (element.getKind() == ElementKind.CLASS || element.getKind() == ElementKind.INTERFACE
+						|| element.getKind() == ElementKind.ENUM) {
 					TypeElement type = (TypeElement) element;
 
 					if (CurrentEnv.getConfig().shouldGenerateBindingFor(type)) {
@@ -77,9 +81,8 @@ public class Processor extends AbstractProcessor {
 	}
 
 	private void warnAnnotatedTypeOutsideScope(TypeElement type) {
-		this.processingEnv.getMessager().printMessage(
-			Kind.WARNING,
-			"Element " + type + " was annotated with @" + Bindable.class.getSimpleName() + " but was outside the specified scope");
+		this.processingEnv.getMessager().printMessage(Kind.WARNING, "Element " + type + " was annotated with @"
+				+ Bindable.class.getSimpleName() + " but was outside the specified scope");
 	}
 
 	/**
@@ -98,10 +101,12 @@ public class Processor extends AbstractProcessor {
 	/** Logs <code>e</code> to <code>SOURCE_OUTPUT/bindgen-errors.txt</code> */
 	private void logExceptionToTextFile(Exception e) {
 		try {
-			FileObject fo = this.processingEnv.getFiler().createResource(StandardLocation.SOURCE_OUTPUT, "", "bindgen-exception.txt");
+			FileObject fo = this.processingEnv.getFiler().createResource(StandardLocation.SOURCE_OUTPUT, "",
+					"bindgen-exception.txt");
 			OutputStream out = fo.openOutputStream();
 			e.printStackTrace(new PrintStream(out));
-			// Specifically for Eclipse's AbortCompilation exception which has a useless printStackTrace output
+			// Specifically for Eclipse's AbortCompilation exception which has a
+			// useless printStackTrace output
 			try {
 				Field f = e.getClass().getField("problem");
 				Object problem = f.get(e);
@@ -110,7 +115,20 @@ public class Processor extends AbstractProcessor {
 			}
 			out.close();
 		} catch (Exception e2) {
-			this.processingEnv.getMessager().printMessage(Kind.ERROR, "Error writing out error message " + e2.getMessage());
+			this.processingEnv.getMessager().printMessage(Kind.ERROR,
+					"Error writing out error message " + e2.getMessage());
+		}
+	}
+
+	@Override
+	public SourceVersion getSupportedSourceVersion() {
+		// from https://bugs.openjdk.java.net/browse/JDK-8037955
+		if (SourceVersion.latest().name().compareTo("RELEASE_8") >= 0) {
+			// si dans une JVM >= à java 8, on répond RELEASE_8
+			return SourceVersion.valueOf("RELEASE_8");
+		} else {
+			// sinon, on retourne la version courante (donc supportée)
+			return SourceVersion.latest();
 		}
 	}
 
