@@ -15,7 +15,7 @@ simpleProject {
 	config.triggerSetPollSpecCronExpression = 'H H/3 * * *'
 	config.notificationRecipients = 'grp-jenkins@lists.projects.openwide.fr'
 	config.buildBlockerSimpleLock = 'bindgen.*'
-	config.jdk = env.JOB_NAME.contains('jdk8') ? 'JDK 1.8' : 'JDK 1.7'
+	config.jdk = env.JOB_NAME.contains('jdk7') ? 'JDK 1.7' : 'JDK 1.8'
 	config.buildTarget = 'install'
 	config.defaultMavenArgs = '-f processor/pom.xml -Dmaven.repo.local="${WORKSPACE}/m2-repository/"'
 	config.beforeNotification = {
