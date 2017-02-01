@@ -17,7 +17,7 @@ simpleProject {
 	config.buildBlockerSimpleLock = 'bindgen.*'
 	config.jdk = env.JOB_NAME.contains('jdk8') ? 'JDK 1.8' : 'JDK 1.7'
 	config.buildTarget = 'install'
-	config.defaultMavenArgs = '-Dmaven.repo.local="${WORKSPACE}/m2-repository/"'
+	config.defaultMavenArgs = '-f processor/pom.xml -Dmaven.repo.local="${WORKSPACE}/m2-repository/"'
 	config.beforeNotification = {
 		util_sh 'rm -rf "${WORKSPACE}/m2-repository/"'
 	}
