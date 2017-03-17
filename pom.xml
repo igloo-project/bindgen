@@ -4,7 +4,7 @@
 	
 	<artifactId>bindgen-parent</artifactId>
 	<groupId>org.bindgen</groupId>
-	<version>3.1-SNAPSHOT</version>
+	<version>3.1.0</version>
 	<packaging>pom</packaging>
 	
 	<name>Bindgen (parent)</name>
@@ -41,13 +41,6 @@
 						<target>1.7</target>
 						<compilerArgument>-proc:none</compilerArgument>
 						<testCompilerArgument>-proc:none</testCompilerArgument>
-					</configuration>
-				</plugin>
-				<plugin>
-					<artifactId>maven-javadoc-plugin</artifactId>
-					<version>2.10.3</version>
-					<configuration>
-						<additionalparam>-Xdoclint:none</additionalparam>
 					</configuration>
 				</plugin>
 			</plugins>

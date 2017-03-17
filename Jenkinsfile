@@ -12,12 +12,11 @@ simpleProject {
 	config.githubUrl = 'https://github.com/openwide-java/bindgen/'
 
 	// jenkins choose to poll once by 3 hours
-	config.triggerSetPollSpecCronExpression = 'H H/3 * * *'
 	config.notificationRecipients = 'grp-jenkins@lists.projects.openwide.fr'
 	config.buildBlockerSimpleLock = 'bindgen.*'
 	config.jdk = env.JOB_NAME.contains('jdk7') ? 'JDK 1.7' : 'JDK 1.8'
 	config.buildTarget = 'install'
-	config.defaultMavenArgs = '-f processor/pom.xml -Dmaven.repo.local="${WORKSPACE}/m2-repository/"'
+	config.defaultMavenArgs = '-Ddistribution=owsi-core-release -DperformRelease=true -Dmaven.javadoc.skip=true -Dmaven.repo.local="${WORKSPACE}/m2-repository/"'
 	config.beforeNotification = {
 		util_sh 'rm -rf "${WORKSPACE}/m2-repository/"'
 	}
