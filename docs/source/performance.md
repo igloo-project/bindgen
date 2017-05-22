@@ -1,8 +1,3 @@
----
-layout: default
-title: Performance
----
-
 Performance
 ===========
 
@@ -106,5 +101,3 @@ The test code:
 </pre>
 
 This should be a reproducible Japex-driven test, but is not yet.
-
-

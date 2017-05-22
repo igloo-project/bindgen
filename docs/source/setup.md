@@ -1,8 +1,3 @@
----
-layout: default
-title: Setup
----
-
 Setup
 =====
 
@@ -75,4 +70,3 @@ To setup Eclipse, use the Project Properties. Right-click on your Eclipse projec
 </pre>
 
 If you are having problems, you want to ensure that under `Factory Path`, clicking the "Advanced"  button lists the `org.bindgen.processor.Processor` class. If it does not, something is not setup correctly. Try the above steps again and potentially open/close the project and/or Eclipse itself.
-

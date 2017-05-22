@@ -1,8 +1,3 @@
----
-layout: default
-title: Examples FooBinding
----
-
 FooBinding
 ==========
 
@@ -55,4 +50,3 @@ E.g. something like:
       }
     }
 </pre>
-

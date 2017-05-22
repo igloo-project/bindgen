@@ -1,8 +1,3 @@
----
-layout: default
-title: Configuration
----
-
 Configuration
 =============
 
@@ -89,5 +84,3 @@ Binding Super Class
 The generated `XxxBindingPath` classes typically extend an internal Bindgen `AbstractBinding` class. If you'd prefer to have them extend your own class, you can set:
 
     bindingPathSuperClass=your.class.Name
-
-

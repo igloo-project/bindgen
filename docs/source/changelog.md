@@ -1,8 +1,3 @@
----
-layout: default
-title: Changelog
----
-
 Changelog
 =========
 
@@ -73,7 +68,7 @@ Changelog
 ## 2.9 - 2010-03-21
 
 * New Feature: generate bindings for prefix-less getters (e.g. `int foo()`) (Mihai)
-* New Feature: `bindingPathSuperClass` configuration property to have generated bindings extend a custom base class (Mihai) 
+* New Feature: `bindingPathSuperClass` configuration property to have generated bindings extend a custom base class (Mihai)
 * Fix: Bindings are no longer non-deterministic/based on source-code order in cases where multiple properties overlap (Mihai)
 * Fix: Correctly handle inner classes contained within outer classes that have a lower-case name
 * Fix: Correctly handle bindings of classes in the default package
@@ -144,4 +139,3 @@ Changelog
 ## 1.0 - 2009-03-26
 
 * Initial release
-
