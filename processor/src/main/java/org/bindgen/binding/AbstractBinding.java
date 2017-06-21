@@ -5,29 +5,66 @@ import java.util.List;
 
 import org.bindgen.Binding;
 import org.bindgen.BindingRoot;
+import org.bindgen.Getter;
+import org.bindgen.Setter;
 
 /**
  * A base implementation of {@link BindingRoot} to hold the starting
  * <code>T</code> value for evaluating bindings paths.
  */
-public abstract class AbstractBinding<R, T> implements BindingRoot<R, T> {
+public class AbstractBinding<R, P, T> implements BindingRoot<R, T> {
 
 	private static final long serialVersionUID = 1L;
+
+	protected String bindingName;
+	protected BindingRoot<R, P> bindingParentBinding;
+	protected Getter<P, T> bindingGetter;
+	protected Setter<P, T> bindingSetter;
+	protected Class<?> bindingType;
+
 	protected T _value;
+
+	public AbstractBinding() {
+	}
+
+	public AbstractBinding(String name, Class<?> type, BindingRoot<R, P> parentBinding, Getter<P, T> getter,
+			Setter<P, T> setter) {
+		this.bindingName = name;
+		this.bindingParentBinding = parentBinding;
+		this.bindingGetter = getter;
+		this.bindingSetter = setter;
+		this.bindingType = type;
+	}
 
 	@Override
 	public T get() {
-		return this._value;
+		if (this.bindingParentBinding != null && this.bindingGetter != null) {
+			return this.bindingGetter.get(this.bindingParentBinding.get());
+		} else {
+			return this._value;
+		}
 	}
 
 	@Override
 	public void set(T value) {
-		this._value = value;
+		if (this.bindingParentBinding != null && this.bindingSetter == null) {
+			throw new RuntimeException(this.getName() + " is read only");
+		} else if (this.bindingSetter != null) {
+			this.bindingSetter.set(this.bindingParentBinding.get(), value);
+		} else {
+			this._value = value;
+		}
 	}
 
 	@Override
 	public void setWithRoot(R root, T value) {
-		throw new RuntimeException("Should be overridden by a field/method-specific binding.");
+		if (this.bindingParentBinding != null && this.bindingSetter == null) {
+			throw new RuntimeException(this.getName() + " is read only");
+		} else if (this.bindingSetter != null) {
+			this.bindingSetter.set(this.bindingParentBinding.getWithRoot(root), value);
+		} else {
+			this._value = value;
+		}
 	}
 
 	@Override
@@ -43,12 +80,13 @@ public abstract class AbstractBinding<R, T> implements BindingRoot<R, T> {
 	@Override
 	@SuppressWarnings("unchecked")
 	public Binding<R> getRootBinding() {
-		Binding<?> parent = getParentBinding();
+		Binding<?> parent = this.getParentBinding();
 		if (parent == null) {
 			// We should be in a BindingRoot<R, R> => Cast is safe
 			return (Binding<R>) this;
 		} else {
-			// Parent's root type is expected to be the same as ours => Cast is safe
+			// Parent's root type is expected to be the same as ours => Cast is
+			// safe
 			return (Binding<R>) parent.getRootBinding();
 		}
 	}
@@ -56,7 +94,8 @@ public abstract class AbstractBinding<R, T> implements BindingRoot<R, T> {
 	@Override
 	public String toString() {
 		if (this.getParentBinding() == null) {
-			// This is kind of lame, but GWT doesn't support getSimpleName, so use getName
+			// This is kind of lame, but GWT doesn't support getSimpleName, so
+			// use getName
 			String className = this.getClass().getName();
 			String simpleName = className.substring(className.lastIndexOf(".") + 1);
 			return simpleName + "(" + this.get() + ")";
@@ -99,7 +138,44 @@ public abstract class AbstractBinding<R, T> implements BindingRoot<R, T> {
 
 	@Override
 	public boolean getBindingIsReadOnly() {
-		return false;
+		return this.bindingParentBinding == null || this.bindingSetter != null;
+	}
+
+	@Override
+	public String getName() {
+		if (this.bindingName != null) {
+			return this.bindingName;
+		} else {
+			return "";
+		}
+	}
+
+	@Override
+	public T getWithRoot(R root) {
+		if (this.bindingParentBinding != null && this.bindingGetter != null) {
+			return this.bindingGetter.get(this.bindingParentBinding.getWithRoot(root));
+		} else {
+			return this._value;
+		}
+	}
+
+	@Override
+	public T getSafelyWithRoot(R root) {
+		if (this.bindingParentBinding != null && this.bindingGetter != null) {
+			P parent = this.bindingParentBinding.getSafelyWithRoot(root);
+			if (parent != null) {
+				return this.bindingGetter.get(parent);
+			} else {
+				return null;
+			}
+		} else {
+			return this._value;
+		}
+	}
+
+	@Override
+	public Class<?> getType() {
+		return this.bindingType;
 	}
 
 }

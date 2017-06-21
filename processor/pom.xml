@@ -5,12 +5,10 @@
 	<parent>
 		<groupId>org.bindgen</groupId>
 		<artifactId>bindgen-parent</artifactId>
-		<version>3.3-SNAPSHOT</version>
+		<version>4.0-SNAPSHOT</version>
 	</parent>
 	
 	<artifactId>bindgen</artifactId>
-	<groupId>org.bindgen</groupId>
-	<version>3.3-SNAPSHOT</version>
 	
 	<name>Bindgen</name>
 
@@ -34,8 +32,8 @@
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.6.0</version>
 			</plugin>
 		</plugins>
 	</build>

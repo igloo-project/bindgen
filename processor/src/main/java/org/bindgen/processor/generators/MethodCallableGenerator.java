@@ -23,6 +23,7 @@ import joist.util.Inflector;
 
 import org.bindgen.NamedBinding;
 import org.bindgen.processor.CurrentEnv;
+import org.bindgen.processor.util.BoundClass;
 import org.bindgen.processor.util.Util;
 
 public class MethodCallableGenerator implements PropertyGenerator {
@@ -207,7 +208,7 @@ public class MethodCallableGenerator implements PropertyGenerator {
 
 	public static class Factory implements GeneratorFactory {
 		@Override
-		public MethodCallableGenerator newGenerator(GClass outerClass, TypeElement outerElement, Element possibleMethod, Collection<String> namesTaken) throws WrongGeneratorException {
+		public MethodCallableGenerator newGenerator(GClass outerClass, BoundClass boundClass, TypeElement outerElement, Element possibleMethod, Collection<String> namesTaken) throws WrongGeneratorException {
 			if (possibleMethod.getKind() != ElementKind.METHOD) {
 				throw new WrongGeneratorException();
 			}

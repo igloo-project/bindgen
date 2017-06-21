@@ -7,15 +7,16 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 
-import joist.sourcegen.GClass;
-import joist.sourcegen.GMethod;
-
 import org.bindgen.ContainerBinding;
+import org.bindgen.processor.util.BoundClass;
 import org.bindgen.processor.util.BoundProperty;
 import org.bindgen.processor.util.Util;
 
+import joist.sourcegen.GClass;
+import joist.sourcegen.GMethod;
+
 /**
- * Generates bindings for fields 
+ * Generates bindings for fields
  */
 public class FieldPropertyGenerator implements PropertyGenerator {
 
@@ -26,12 +27,13 @@ public class FieldPropertyGenerator implements PropertyGenerator {
 	private final boolean isFinal;
 	private GClass innerClass;
 
-	public FieldPropertyGenerator(GClass outerClass, TypeElement outerElement, Element field, String propertyName) throws WrongGeneratorException {
+	public FieldPropertyGenerator(GClass outerClass, BoundClass boundClass, TypeElement outerElement, Element field, String propertyName)
+			throws WrongGeneratorException {
 		this.outerClass = outerClass;
 		this.field = field;
 		this.fieldName = this.field.getSimpleName().toString();
 
-		this.property = new BoundProperty(outerElement, this.field, this.field.asType(), propertyName);
+		this.property = new BoundProperty(outerElement, boundClass, this.field, this.field.asType(), propertyName);
 		if (this.property.shouldSkip()) {
 			throw new WrongGeneratorException();
 		}
@@ -68,7 +70,8 @@ public class FieldPropertyGenerator implements PropertyGenerator {
 		fieldGet.setAccess(Util.getAccess(this.field));
 		fieldGet.returnType(this.property.getBindingClassFieldDeclaration());
 		fieldGet.body.line("if (this.{} == null) {", this.property.getName());
-		fieldGet.body.line("    this.{} = new {}();", this.property.getName(), this.property.getBindingRootClassInstantiation());
+		fieldGet.body.line("    this.{} = new {}();", this.property.getName(),
+				this.property.getBindingRootClassInstantiation());
 		fieldGet.body.line("}");
 		fieldGet.body.line("return this.{};", this.property.getName());
 	}
@@ -80,8 +83,12 @@ public class FieldPropertyGenerator implements PropertyGenerator {
 		if (this.property.isForGenericTypeParameter() || this.property.isArray()) {
 			this.innerClass.getMethod("getType").returnType("Class<?>").body.line("return null;");
 		} else if (!this.property.shouldGenerateBindingClassForType()) {
-			// since no binding class will be generated for the type of this field we may not inherit getType() in MyBinding class (if, for example, MyBinding extends GenericObjectBindingPath) and so we have to implement it ouselves
-			this.innerClass.getMethod("getType").returnType("Class<?>").body.line("return {}.class;", this.property.getReturnableType());
+			// since no binding class will be generated for the type of this
+			// field we may not inherit getType() in MyBinding class (if, for
+			// example, MyBinding extends GenericObjectBindingPath) and so we
+			// have to implement it ouselves
+			this.innerClass.getMethod("getType").returnType("Class<?>").body.line("return {}.class;",
+					this.property.getReturnableType());
 		}
 	}
 
@@ -91,25 +98,23 @@ public class FieldPropertyGenerator implements PropertyGenerator {
 	}
 
 	private void addInnerClassGetParent() {
-		GMethod getParent = this.innerClass.getMethod("getParentBinding").returnType("Binding<?>").addAnnotation("@Override");
+		GMethod getParent = this.innerClass.getMethod("getParentBinding").returnType("Binding<?>")
+				.addAnnotation("@Override");
 		getParent.body.line("return {}.this;", this.outerClass.getSimpleName());
 	}
 
 	private void addInnerClassGet() {
-		GMethod get = this.innerClass.getMethod("get").returnType(this.property.getSetType()).addAnnotation("@Override");
-		get.body.line("return {}{}.this.get().{};",//
-			this.property.getCastForReturnIfNeeded(),
-			this.outerClass.getSimpleName(),
-			this.fieldName);
+		GMethod get = this.innerClass.getMethod("get").returnType(this.property.getSetType())
+				.addAnnotation("@Override");
+		get.body.line("return {}{}.this.get().{};", //
+				this.property.getCastForReturnIfNeeded(), this.outerClass.getSimpleName(), this.fieldName);
 	}
 
 	private void addInnerClassGetWithRoot() {
 		GMethod getWithRoot = this.innerClass.getMethod("getWithRoot");
 		getWithRoot.argument("R", "root").returnType(this.property.getSetType()).addAnnotation("@Override");
-		getWithRoot.body.line("return {}{}.this.getWithRoot(root).{};",//
-			this.property.getCastForReturnIfNeeded(),
-			this.outerClass.getSimpleName(),
-			this.fieldName);
+		getWithRoot.body.line("return {}{}.this.getWithRoot(root).{};", //
+				this.property.getCastForReturnIfNeeded(), this.outerClass.getSimpleName(), this.fieldName);
 	}
 
 	private void addInnerClassGetSafelyWithRoot() {
@@ -118,10 +123,8 @@ public class FieldPropertyGenerator implements PropertyGenerator {
 		m.body.line("if ({}.this.getSafelyWithRoot(root) == null) {", this.outerClass.getSimpleName());
 		m.body.line("    return null;");
 		m.body.line("} else {");
-		m.body.line("    return {}{}.this.getSafelyWithRoot(root).{};",//
-			this.property.getCastForReturnIfNeeded(),
-			this.outerClass.getSimpleName(),
-			this.fieldName);
+		m.body.line("    return {}{}.this.getSafelyWithRoot(root).{};", //
+				this.property.getCastForReturnIfNeeded(), this.outerClass.getSimpleName(), this.fieldName);
 		m.body.line("}");
 	}
 
@@ -132,29 +135,27 @@ public class FieldPropertyGenerator implements PropertyGenerator {
 			set.body.line("throw new RuntimeException(this.getName() + \" is read only\");");
 			return;
 		}
-		set.body.line("{}.this.get().{} = {};",//
-			this.outerClass.getSimpleName(),
-			this.fieldName,
-			this.property.getName());
+		set.body.line("{}.this.get().{} = {};", //
+				this.outerClass.getSimpleName(), this.fieldName, this.property.getName());
 	}
 
 	private void addInnerClassSetWithRoot() {
-		GMethod setWithRoot = this.innerClass.getMethod("setWithRoot(R root, {} {})", this.property.getSetType(), this.property.getName());
+		GMethod setWithRoot = this.innerClass.getMethod("setWithRoot(R root, {} {})", this.property.getSetType(),
+				this.property.getName());
 		setWithRoot.addAnnotation("@Override");
 		if (this.isFinal) {
 			setWithRoot.body.line("throw new RuntimeException(this.getName() + \" is read only\");");
 			return;
 		}
-		setWithRoot.body.line("{}.this.getWithRoot(root).{} = {};",//
-			this.outerClass.getSimpleName(),
-			this.fieldName,
-			this.property.getName());
+		setWithRoot.body.line("{}.this.getWithRoot(root).{} = {};", //
+				this.outerClass.getSimpleName(), this.fieldName, this.property.getName());
 	}
 
 	private void addInnerClassGetContainedTypeIfNeeded() {
 		if (this.property.isForListOrSet() && !this.property.matchesTypeParameterOfParent()) {
 			this.innerClass.implementsInterface(ContainerBinding.class);
-			GMethod getContainedType = this.innerClass.getMethod("getContainedType").returnType("Class<?>").addAnnotation("@Override");
+			GMethod getContainedType = this.innerClass.getMethod("getContainedType").returnType("Class<?>")
+					.addAnnotation("@Override");
 			getContainedType.body.line("return {};", this.property.getContainedType());
 		}
 	}
@@ -185,7 +186,8 @@ public class FieldPropertyGenerator implements PropertyGenerator {
 
 	public static class Factory implements GeneratorFactory {
 		@Override
-		public FieldPropertyGenerator newGenerator(GClass outerClass, TypeElement outerElement, Element possibleField, Collection<String> namesTaken) throws WrongGeneratorException {
+		public FieldPropertyGenerator newGenerator(GClass outerClass, BoundClass boundClass, TypeElement outerElement,
+				Element possibleField, Collection<String> namesTaken) throws WrongGeneratorException {
 			if (possibleField.getKind() != ElementKind.FIELD) {
 				throw new WrongGeneratorException();
 			}
@@ -198,7 +200,7 @@ public class FieldPropertyGenerator implements PropertyGenerator {
 				propertyName += "Field"; // Still invalid
 			}
 
-			return new FieldPropertyGenerator(outerClass, outerElement, possibleField, propertyName);
+			return new FieldPropertyGenerator(outerClass, boundClass, outerElement, possibleField, propertyName);
 		}
 	}
 }

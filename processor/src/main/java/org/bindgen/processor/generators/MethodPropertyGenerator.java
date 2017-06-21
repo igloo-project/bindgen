@@ -15,18 +15,23 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 
-import joist.sourcegen.GClass;
-import joist.sourcegen.GMethod;
-
 import org.bindgen.ContainerBinding;
 import org.bindgen.processor.CurrentEnv;
+import org.bindgen.processor.util.BoundClass;
 import org.bindgen.processor.util.BoundProperty;
 import org.bindgen.processor.util.Util;
 
-/** Generates bindings for method properties like getFoo/setFoo, foo/foo(), with setters being optional. */
+import joist.sourcegen.GClass;
+import joist.sourcegen.GMethod;
+
+/**
+ * Generates bindings for method properties like getFoo/setFoo, foo/foo(), with
+ * setters being optional.
+ */
 public class MethodPropertyGenerator implements PropertyGenerator {
 
 	private final TypeElement outerElement;
+	private final BoundClass boundClass;
 	private final AccessorPrefix prefix;
 	private final GClass outerClass;
 	private final ExecutableElement method;
@@ -34,19 +39,17 @@ public class MethodPropertyGenerator implements PropertyGenerator {
 	private final BoundProperty property;
 	private GClass innerClass;
 
-	public MethodPropertyGenerator(
-		GClass outerClass,
-		TypeElement outerElement,
-		ExecutableElement method,
-		ExecutableType inContext,
-		AccessorPrefix prefix,
-		String propertyName) throws WrongGeneratorException {
+	public MethodPropertyGenerator(GClass outerClass, BoundClass boundClass, TypeElement outerElement,
+			ExecutableElement method, ExecutableType inContext, AccessorPrefix prefix, String propertyName)
+			throws WrongGeneratorException {
 		this.outerElement = outerElement;
+		this.boundClass = boundClass;
 		this.outerClass = outerClass;
 		this.method = method;
 		this.methodName = method.getSimpleName().toString();
 		this.prefix = prefix;
-		this.property = new BoundProperty(outerElement, this.method, inContext.getReturnType(), propertyName);
+		this.property = new BoundProperty(outerElement, boundClass, this.method, inContext.getReturnType(),
+				propertyName);
 		if (!this.methodNotVoidNoParamsNoThrows() || this.property.shouldSkip()) {
 			throw new WrongGeneratorException();
 		}
@@ -55,22 +58,22 @@ public class MethodPropertyGenerator implements PropertyGenerator {
 	public void generate() {
 		this.addOuterClassGet();
 		this.addOuterClassBindingField();
-		this.addInnerClass();
-		this.addInnerClassGetName();
-		this.addInnerClassParent();
-		this.addInnerClassGet();
-		this.addInnerClassGetWithRoot();
-		this.addInnerClassGetSafelyWithRoot();
-		if (this.hasSetterMethod()) {
-			this.addInnerClassSet();
-			this.addInnerClassSetWithRoot();
-		} else {
-			this.addReadOnlyInnerClassSet();
-			this.addReadOnlyInnerClassSetWithRoot();
-			this.addInnerClassIsReadOnlyOverride();
-		}
-		this.addInnerClassGetContainedTypeIfNeeded();
-		this.addInnerClassSerialVersionUID();
+		// this.addInnerClass();
+		// this.addInnerClassGetName();
+		// this.addInnerClassParent();
+		// this.addInnerClassGet();
+		// this.addInnerClassGetWithRoot();
+		// this.addInnerClassGetSafelyWithRoot();
+		// if (this.hasSetterMethod()) {
+		// this.addInnerClassSet();
+		// this.addInnerClassSetWithRoot();
+		// } else {
+		// this.addReadOnlyInnerClassSet();
+		// this.addReadOnlyInnerClassSetWithRoot();
+		// this.addInnerClassIsReadOnlyOverride();
+		// }
+		// this.addInnerClassGetContainedTypeIfNeeded();
+		// this.addInnerClassSerialVersionUID();
 	}
 
 	private boolean hasSetterMethod() {
@@ -84,10 +87,12 @@ public class MethodPropertyGenerator implements PropertyGenerator {
 				// single parameter and no throws
 				if (enclosed.getParameters().size() == 1 && enclosed.getThrownTypes().isEmpty()) {
 					TypeMirror parameterType = enclosed.getParameters().get(0).asType();
-					TypeMirror resolvedParameterType = Util.resolveTypeVarIfPossible(getTypeUtils(), this.outerElement, parameterType).type;
+					TypeMirror resolvedParameterType = Util.resolveTypeVarIfPossible(getTypeUtils(), this.outerElement,
+							parameterType).type;
 					TypeMirror boxedResolved = Util.boxIfNeeded(resolvedParameterType);
 					if (getTypeUtils().isSameType(Util.boxIfNeeded(this.property.getType()), boxedResolved)) {
-						return true; // setter parameter type matches getter return type
+						return true; // setter parameter type matches getter
+										// return type
 					}
 				}
 			}
@@ -113,13 +118,48 @@ public class MethodPropertyGenerator implements PropertyGenerator {
 	}
 
 	private void addOuterClassGet() {
+		String bindingType = this.property.getInnerClassSuperClass();
 		GMethod fieldGet = this.outerClass.getMethod(this.property.getName() + "()");
 		fieldGet.setAccess(Util.getAccess(this.method));
-		fieldGet.returnType(this.property.getBindingClassFieldDeclaration());
+		fieldGet.returnType(bindingType);
+		if (bindingType.contains("U1")) {
+			fieldGet.typeParameters("U0, U1");
+		} else if (bindingType.contains("U0")) {
+			fieldGet.typeParameters("U0");
+		}
 		fieldGet.body.line("if (this.{} == null) {", this.property.getName());
-		fieldGet.body.line("    this.{} = new {}();", this.property.getName(), this.property.getBindingRootClassInstantiation());
+
+		String type;
+		if (this.property.isForGenericTypeParameter() || this.property.isArray()) {
+			type = "null";
+		} else if (!this.property.shouldGenerateBindingClassForType()) {
+			// since no binding class will be generated for the return type of
+			// this method we may not inherit getType() in MyBinding class (if,
+			// for example, MyBinding extends GenericObjectBindingPath) and so
+			// we have to implement it ouselves
+			type = String.format("%s.class", this.property.getReturnableType());
+		} else {
+			type = "null";
+		}
+
+		if (!this.property.shouldGenerateBindingClassForType() && !this.property.existsFieldTypeBindingFor()) {
+			fieldGet.body.line(
+					"    this.{} = ({}) (Object) new {}(\"{}\", {}, this, (item) -> item.{}(), null/*(item, value) -> item.{}(value)*/);",
+					this.property.getName(), this.property.getBindingClassFieldDeclaration(), this.property.getInnerClassSuperClass(), this.property.getName(), type,
+					this.methodName, this.prefix.setterName(this.methodName));
+		} else if (this.property.isArray()) {
+			fieldGet.body.line(
+					"    this.{} = ({}) (Object) new {}(\"{}\", {}, this, (item) -> item.{}(), null/*(item, value) -> item.{}(value)*/);",
+					this.property.getName(), this.property.getBindingClassFieldDeclaration(), this.property.getInnerClassSuperClass(), this.property.getName(), null,
+					this.methodName, this.prefix.setterName(this.methodName));
+		} else {
+			fieldGet.body.line(
+					"    this.{} = ({}) (Object) new {}(\"{}\", this, (item) -> item.{}(), null/*(item, value) -> item.{}(value)*/);",
+					this.property.getName(), this.property.getBindingClassFieldDeclaration(), this.property.getInnerClassSuperClass(), this.property.getName(),
+					this.methodName, this.prefix.setterName(this.methodName));
+		}
 		fieldGet.body.line("}");
-		fieldGet.body.line("return this.{};", this.property.getName());
+		fieldGet.body.line("return ({}) (Object) this.{};", bindingType, this.property.getName());
 	}
 
 	private void addOuterClassBindingField() {
@@ -133,8 +173,12 @@ public class MethodPropertyGenerator implements PropertyGenerator {
 		if (this.property.isForGenericTypeParameter() || this.property.isArray()) {
 			this.innerClass.getMethod("getType").returnType("Class<?>").body.line("return null;");
 		} else if (!this.property.shouldGenerateBindingClassForType()) {
-			// since no binding class will be generated for the return type of this method we may not inherit getType() in MyBinding class (if, for example, MyBinding extends GenericObjectBindingPath) and so we have to implement it ouselves
-			this.innerClass.getMethod("getType").returnType("Class<?>").body.line("return {}.class;", this.property.getReturnableType());
+			// since no binding class will be generated for the return type of
+			// this method we may not inherit getType() in MyBinding class (if,
+			// for example, MyBinding extends GenericObjectBindingPath) and so
+			// we have to implement it ouselves
+			this.innerClass.getMethod("getType").returnType("Class<?>").body.line("return {}.class;",
+					this.property.getReturnableType());
 		}
 	}
 
@@ -144,26 +188,23 @@ public class MethodPropertyGenerator implements PropertyGenerator {
 	}
 
 	private void addInnerClassParent() {
-		GMethod getParent = this.innerClass.getMethod("getParentBinding").returnType("Binding<?>").addAnnotation("@Override");
+		GMethod getParent = this.innerClass.getMethod("getParentBinding").returnType("Binding<?>")
+				.addAnnotation("@Override");
 		getParent.body.line("return {}.this;", this.outerClass.getSimpleName());
 	}
 
 	private void addInnerClassGet() {
 		GMethod get = this.innerClass.getMethod("get");
 		get.returnType(this.property.getSetType()).addAnnotation("@Override");
-		get.body.line("return {}{}.this.get().{}();",//
-			this.property.getCastForReturnIfNeeded(),
-			this.outerClass.getSimpleName(),
-			this.methodName);
+		get.body.line("return {}{}.this.get().{}();", //
+				this.property.getCastForReturnIfNeeded(), this.outerClass.getSimpleName(), this.methodName);
 	}
 
 	private void addInnerClassGetWithRoot() {
 		GMethod getWithRoot = this.innerClass.getMethod("getWithRoot");
 		getWithRoot.argument("R", "root").returnType(this.property.getSetType()).addAnnotation("@Override");
-		getWithRoot.body.line("return {}{}.this.getWithRoot(root).{}();",//
-			this.property.getCastForReturnIfNeeded(),
-			this.outerClass.getSimpleName(),
-			this.methodName);
+		getWithRoot.body.line("return {}{}.this.getWithRoot(root).{}();", //
+				this.property.getCastForReturnIfNeeded(), this.outerClass.getSimpleName(), this.methodName);
 	}
 
 	private void addInnerClassGetSafelyWithRoot() {
@@ -172,10 +213,8 @@ public class MethodPropertyGenerator implements PropertyGenerator {
 		m.body.line("if ({}.this.getSafelyWithRoot(root) == null) {", this.outerClass.getSimpleName());
 		m.body.line("    return null;");
 		m.body.line("} else {");
-		m.body.line("    return {}{}.this.getWithRoot(root).{}();",//
-			this.property.getCastForReturnIfNeeded(),
-			this.outerClass.getSimpleName(),
-			this.methodName);
+		m.body.line("    return {}{}.this.getWithRoot(root).{}();", //
+				this.property.getCastForReturnIfNeeded(), this.outerClass.getSimpleName(), this.methodName);
 		m.body.line("}");
 	}
 
@@ -187,7 +226,8 @@ public class MethodPropertyGenerator implements PropertyGenerator {
 	}
 
 	private void addReadOnlyInnerClassSetWithRoot() {
-		GMethod setWithRoot = this.innerClass.getMethod("setWithRoot(R root, {} {})", this.property.getSetType(), this.property.getName());
+		GMethod setWithRoot = this.innerClass.getMethod("setWithRoot(R root, {} {})", this.property.getSetType(),
+				this.property.getName());
 		setWithRoot.addAnnotation("@Override");
 		setWithRoot.body.line("throw new RuntimeException(this.getName() + \" is read only\");");
 	}
@@ -199,25 +239,23 @@ public class MethodPropertyGenerator implements PropertyGenerator {
 	private void addInnerClassSet() {
 		GMethod set = this.innerClass.getMethod("set({} {})", this.property.getSetType(), this.property.getName());
 		set.addAnnotation("@Override");
-		set.body.line("{}.this.get().{}({});",//
-			this.outerClass.getSimpleName(),
-			this.prefix.setterName(this.methodName),
-			this.property.getName());
+		set.body.line("{}.this.get().{}({});", //
+				this.outerClass.getSimpleName(), this.prefix.setterName(this.methodName), this.property.getName());
 	}
 
 	private void addInnerClassSetWithRoot() {
-		GMethod setWithRoot = this.innerClass.getMethod("setWithRoot(R root, {} {})", this.property.getSetType(), this.property.getName());
+		GMethod setWithRoot = this.innerClass.getMethod("setWithRoot(R root, {} {})", this.property.getSetType(),
+				this.property.getName());
 		setWithRoot.addAnnotation("@Override");
-		setWithRoot.body.line("{}.this.getWithRoot(root).{}({});",//
-			this.outerClass.getSimpleName(),
-			this.prefix.setterName(this.methodName),
-			this.property.getName());
+		setWithRoot.body.line("{}.this.getWithRoot(root).{}({});", //
+				this.outerClass.getSimpleName(), this.prefix.setterName(this.methodName), this.property.getName());
 	}
 
 	private void addInnerClassGetContainedTypeIfNeeded() {
 		if (this.property.isForListOrSet() && !this.property.matchesTypeParameterOfParent()) {
 			this.innerClass.implementsInterface(ContainerBinding.class);
-			GMethod getContainedType = this.innerClass.getMethod("getContainedType").returnType("Class<?>").addAnnotation("@Override");
+			GMethod getContainedType = this.innerClass.getMethod("getContainedType").returnType("Class<?>")
+					.addAnnotation("@Override");
 			getContainedType.body.line("return {};", this.property.getContainedType());
 		}
 	}
@@ -249,8 +287,8 @@ public class MethodPropertyGenerator implements PropertyGenerator {
 		}
 
 		@Override
-		public MethodPropertyGenerator
-			newGenerator(GClass outerClass, TypeElement outerElement, Element possibleMethod, Collection<String> namesTaken) throws WrongGeneratorException {
+		public MethodPropertyGenerator newGenerator(GClass outerClass, BoundClass boundClass, TypeElement outerElement,
+				Element possibleMethod, Collection<String> namesTaken) throws WrongGeneratorException {
 			if (possibleMethod.getKind() != ElementKind.METHOD) {
 				throw new WrongGeneratorException();
 			}
@@ -268,17 +306,21 @@ public class MethodPropertyGenerator implements PropertyGenerator {
 			if (namesTaken.contains(propertyName) || Util.isJavaKeyword(propertyName)) {
 				propertyName = methodName;
 			}
-			// 2: If we'd collide with getType or toString, or the method name is already taken, append Binding
-			while (namesTaken.contains(propertyName) || Util.isBindingMethodName(propertyName) || Util.isObjectMethodName(propertyName)) {
+			// 2: If we'd collide with getType or toString, or the method name
+			// is already taken, append Binding
+			while (namesTaken.contains(propertyName) || Util.isBindingMethodName(propertyName)
+					|| Util.isObjectMethodName(propertyName)) {
 				propertyName += "Binding";
 			}
 
 			ExecutableType methodInContext = null;
 			if (outerElement.asType() instanceof DeclaredType) {
 				try {
-					methodInContext = (ExecutableType) CurrentEnv.getTypeUtils().asMemberOf((DeclaredType) outerElement.asType(), method);
+					methodInContext = (ExecutableType) CurrentEnv.getTypeUtils()
+							.asMemberOf((DeclaredType) outerElement.asType(), method);
 				} catch (IllegalArgumentException iae) {
-					// Means that this element does not make sense as an element of the declared type.
+					// Means that this element does not make sense as an element
+					// of the declared type.
 					// Therefore, leave methodInContext null.
 				}
 			}
@@ -286,7 +328,8 @@ public class MethodPropertyGenerator implements PropertyGenerator {
 				methodInContext = (ExecutableType) method.asType();
 			}
 
-			return new MethodPropertyGenerator(outerClass, outerElement, method, methodInContext, this.prefix, propertyName);
+			return new MethodPropertyGenerator(outerClass, boundClass, outerElement, method, methodInContext,
+					this.prefix, propertyName);
 		}
 	}
 }

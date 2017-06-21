@@ -23,9 +23,14 @@ import joist.util.Join;
 import org.bindgen.binding.GenericObjectBindingPath;
 import org.bindgen.processor.CurrentEnv;
 
-/** Given a TypeMirror type of a field/method property, provides information about its binding outer/inner class. */
+/**
+ * Given a TypeMirror type of a field/method property, provides information
+ * about its binding outer/inner class.
+ */
 public class BoundProperty {
 
+	private TypeElement outerElement;
+	private final BoundClass boundClass;
 	private final TypeElement enclosing;
 	private final TypeMirror type;
 	private final Element element;
@@ -35,11 +40,16 @@ public class BoundProperty {
 	private ClassName name;
 
 	/**
-	 * @param enclosed the parent method or field
-	 * @param type our type
-	 * @param propertyName our name on the parent <code>enclosed</code> type
+	 * @param enclosed
+	 *            the parent method or field
+	 * @param type
+	 *            our type
+	 * @param propertyName
+	 *            our name on the parent <code>enclosed</code> type
 	 */
-	public BoundProperty(TypeElement outerElement, Element enclosed, TypeMirror type, String propertyName) {
+	public BoundProperty(TypeElement outerElement, BoundClass boundClass, Element enclosed, TypeMirror type, String propertyName) {
+		this.outerElement = outerElement;
+		this.boundClass = boundClass;
 		this.enclosing = (TypeElement) enclosed.getEnclosingElement();
 		this.propertyName = propertyName;
 
@@ -106,7 +116,8 @@ public class BoundProperty {
 				// our MyFoo inner class can't use wildcards in the declaration,
 				// so we make up dummy Ux type parameters and s/?/Ux
 
-				// First pass: work out what the dummy type names will be for the existing wildcards.
+				// First pass: work out what the dummy type names will be for
+				// the existing wildcards.
 				int wildcardIndex = 0;
 				Map<TypeMirror, String> dummyTypes = new HashMap<TypeMirror, String>();
 				List<WildcardTypeData> wildcardList = new ArrayList<WildcardTypeData>();
@@ -117,11 +128,13 @@ public class BoundProperty {
 						WildcardTypeData wildcard = new WildcardTypeData(dummyParam);
 						WildcardType wt = (WildcardType) tm;
 						if (wt.getExtendsBound() != null) {
-							// the user declared their own bounds, e.g. "public Foo<? extends Foo<?>> foo"
+							// the user declared their own bounds, e.g. "public
+							// Foo<? extends Foo<?>> foo"
 							relevantType = wt.getExtendsBound();
 							wildcard = new WildcardTypeData(dummyParam, wt.getExtendsBound());
 						} else {
-							// get Foo<?>'s declared type, and copy over its type parameters
+							// get Foo<?>'s declared type, and copy over its
+							// type parameters
 							// and their bounds, replacing ? with our U0
 							Element e = ((DeclaredType) this.type).asElement();
 							if (e instanceof TypeElement) {
@@ -141,19 +154,17 @@ public class BoundProperty {
 					}
 				}
 
-				// Second pass: work out the 'extends' suffix for each dummy param.
+				// Second pass: work out the 'extends' suffix for each dummy
+				// param.
 				for (WildcardTypeData wildcard : wildcardList) {
 					String suffix = "";
 					if (wildcard.extendsBound != null) {
-						// the user declared their own bounds, e.g. "public Foo<? extends Foo<?>> foo"
+						// the user declared their own bounds, e.g. "public
+						// Foo<? extends Foo<?>> foo"
 						suffix += " extends " + wildcard.extendsBound.toString();
 					} else if (wildcard.wildcardParameter != null) {
-						suffix += " extends "
-							+ toStringWithDummyParam(
-								wildcard.wildcardParameter.getBounds().get(0),
-								wildcard.wildcardParameter.asType(),
-								wildcard.dummyParam,
-								dummyTypes);
+						suffix += " extends " + toStringWithDummyParam(wildcard.wildcardParameter.getBounds().get(0),
+								wildcard.wildcardParameter.asType(), wildcard.dummyParam, dummyTypes);
 					}
 					dummyParams.add(wildcard.dummyParam + suffix);
 				}
@@ -165,7 +176,10 @@ public class BoundProperty {
 		return name;
 	}
 
-	/** @return whether or not bindgen should generate a binding class for this properties' type */
+	/**
+	 * @return whether or not bindgen should generate a binding class for this
+	 *         properties' type
+	 */
 	public boolean shouldGenerateBindingClassForType() {
 		return CurrentEnv.getConfig().shouldGenerateBindingFor(this.name);
 	}
@@ -177,23 +191,23 @@ public class BoundProperty {
 	private String getInnerClassSuperClass(boolean replaceWildcards) {
 		// Arrays don't have individual binding classes
 		if (this.isArray()) {
-			return getConfig().bindingPathSuperClassName() + "<R, " + this.type.toString() + ">";
+			return getConfig().bindingPathSuperClassName() + "<R, " + this.boundClass.get() + ", " + this.type.toString() + ">";
 		}
 		// Being a generic type, we have no XxxBindingPath to extend, so just extend AbstractBinding directly
 		if (this.isForGenericTypeParameter()) {
-			return getConfig().bindingPathSuperClassName() + "<R, " + this.getGenericElement() + ">";
+			return getConfig().bindingPathSuperClassName() + "<R, " + this.boundClass.get() + ", " + this.getGenericElement() + ">";
 		}
 
 		// if our type is outside the binding scope and no existing binding is available,
 		// we return a generic binding type
 		if (!this.shouldGenerateBindingClassForType()
-				&& !existsFieldTypeBindingFor() // check if type binding already exists ; if so, we can use it
+				&& !this.existsFieldTypeBindingFor() // check if type binding already exists ; if so, we can use it
 				) {
-			return GenericObjectBindingPath.class.getName() + "<R," + this.type.toString() + ">";
+			return GenericObjectBindingPath.class.getName() + "<R, " + this.boundClass.get() + ", " + this.type.toString() + ">";
 		}
 
 		String superName = Util.lowerCaseOuterClassNames(this.element, getConfig().baseNameForBinding(this.name) + "BindingPath");
-		List<String> typeArgs = Copy.list("R");
+		List<String> typeArgs = Copy.list("R", this.boundClass.get());
 		if (this.isRawType()) {
 			for (TypeParameterElement tpe : this.getElement().getTypeParameters()) {
 				typeArgs.add(replaceWildcards ? "?" : tpe.toString());
@@ -255,7 +269,8 @@ public class BoundProperty {
 	}
 
 	public boolean isForListOrSet() {
-		return "java.util.List".equals(this.name.getWithoutGenericPart()) || "java.util.Set".equals(this.name.getWithoutGenericPart());
+		return "java.util.List".equals(this.name.getWithoutGenericPart())
+				|| "java.util.Set".equals(this.name.getWithoutGenericPart());
 	}
 
 	public boolean matchesTypeParameterOfParent() {
@@ -271,7 +286,10 @@ public class BoundProperty {
 		return false;
 	}
 
-	/** @return "com.app.Type<String, String>" if the type is "com.app.Type<String, String>" */
+	/**
+	 * @return "com.app.Type<String, String>" if the type is
+	 *         "com.app.Type<String, String>"
+	 */
 	public String get() {
 		return this.name.get();
 	}
@@ -312,11 +330,11 @@ public class BoundProperty {
 		return this.type.getKind() == TypeKind.DECLARED && ((DeclaredType) this.type).getTypeArguments().size() > 0;
 	}
 
-	/** Add generic suffixes to avoid warnings in bindings for pre-1.5 APIs.
+	/**
+	 * Add generic suffixes to avoid warnings in bindings for pre-1.5 APIs.
 	 *
-	 * This is for old pre-1.5 APIs that use, say, Enumeration. We upgrade it
-	 * to something like Enumeration<String> based on the user configuration,
-	 * e.g.:
+	 * This is for old pre-1.5 APIs that use, say, Enumeration. We upgrade it to
+	 * something like Enumeration<String> based on the user configuration, e.g.:
 	 *
 	 * <code>fixRawType.javax.servlet.http.HttpServletRequest.attributeNames=String</code>
 	 */
@@ -334,7 +352,8 @@ public class BoundProperty {
 	}
 
 	private boolean isDeclaringClass() {
-		// javac returns a stray generic (Class<E>) for inner classes where Eclipse
+		// javac returns a stray generic (Class<E>) for inner classes where
+		// Eclipse
 		// returns the right class (Class<Outer>). For now just skip it.
 		return this.propertyName.equals("declaringClass");
 	}
@@ -347,7 +366,10 @@ public class BoundProperty {
 		return element != null && element.getKind() == ElementKind.TYPE_PARAMETER;
 	}
 
-	/** @return whether the declared type has more type arguments than our usage of it does */
+	/**
+	 * @return whether the declared type has more type arguments than our usage
+	 *         of it does
+	 */
 	private boolean isRawType() {
 		if (this.isFixingRawType) {
 			return false;
@@ -373,9 +395,13 @@ public class BoundProperty {
 		return this.name.getWithoutGenericPart();
 	}
 
-	/** @param dummyTypes
-	 * @return the toString of {@code tm} with {@code tp} replaced by {@code dummyParameter} */
-	private static String toStringWithDummyParam(TypeMirror tm, TypeMirror tp, String dummyParameter, Map<TypeMirror, String> dummyTypes) {
+	/**
+	 * @param dummyTypes
+	 * @return the toString of {@code tm} with {@code tp} replaced by
+	 *         {@code dummyParameter}
+	 */
+	private static String toStringWithDummyParam(TypeMirror tm, TypeMirror tp, String dummyParameter,
+			Map<TypeMirror, String> dummyTypes) {
 		if (tm.getKind() == TypeKind.DECLARED) {
 			DeclaredType dt = (DeclaredType) tm;
 			List<String> params = new ArrayList<String>();
