@@ -88,17 +88,8 @@ public class BindingClassGenerator {
 				new Argument(String.format("%s<R, P>", BindingRoot.class.getName()), "parentBinding"),
 				new Argument(String.format("%s<P, %s>", Getter.class.getName(), this.name.get().toString()), "getter"),
 				new Argument(String.format("%s<P, %s>", Setter.class.getName(), this.name.get().toString()), "setter"))
-				.setBody("this.bindingName = name;\n" + "this.bindingParentBinding = parentBinding;\n" + "this.bindingGetter = getter;\n"
-						+ "this.bindingSetter = setter;\n");
-		// this.pathBindingClass.getField("name").type(String.class);
-		// this.pathBindingClass.getField("parentBinding").type(String.format("%s<R,
-		// P>", BindingRoot.class.getName()));
-		// this.pathBindingClass.getField("getter")
-		// .type(String.format("%s<P, %s>", Getter.class.getName(),
-		// this.name.get().toString()));
-		// this.pathBindingClass.getField("setter")
-		// .type(String.format("%s<P, %s>", Setter.class.getName(),
-		// this.name.get().toString()));
+				.setBody("this.bindingName = name;\n" + "this.bindingParentBinding = parentBinding;\n"
+						+ "this.bindingGetter = getter;\n" + "this.bindingSetter = setter;\n");
 	}
 
 	private void initializeRootBindingClass() {
@@ -224,7 +215,8 @@ public class BindingClassGenerator {
 			for (Iterator<Element> i = elements.iterator(); i.hasNext();) {
 				Element enclosed = i.next();
 				try {
-					PropertyGenerator pg = f.newGenerator(this.pathBindingClass, this.name, this.element, enclosed, namesTaken);
+					PropertyGenerator pg = f.newGenerator(this.pathBindingClass, this.name, this.element, enclosed,
+							namesTaken);
 					if (namesTaken.contains(pg.getPropertyName())) {
 						continue;
 					} else {

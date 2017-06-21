@@ -16,12 +16,12 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.WildcardType;
 
+import org.bindgen.binding.GenericObjectBindingPath;
+import org.bindgen.processor.CurrentEnv;
+
 import joist.util.Copy;
 import joist.util.Inflector;
 import joist.util.Join;
-
-import org.bindgen.binding.GenericObjectBindingPath;
-import org.bindgen.processor.CurrentEnv;
 
 /**
  * Given a TypeMirror type of a field/method property, provides information
@@ -31,13 +31,13 @@ public class BoundProperty {
 
 	private TypeElement outerElement;
 	private final BoundClass boundClass;
-	private final TypeElement enclosing;
+	public final TypeElement enclosing;
 	private final TypeMirror type;
 	private final Element element;
 	private final String propertyName;
 	private final boolean isFixingRawType;
 	private final boolean isArray;
-	private ClassName name;
+	public ClassName name;
 
 	/**
 	 * @param enclosed
@@ -47,7 +47,8 @@ public class BoundProperty {
 	 * @param propertyName
 	 *            our name on the parent <code>enclosed</code> type
 	 */
-	public BoundProperty(TypeElement outerElement, BoundClass boundClass, Element enclosed, TypeMirror type, String propertyName) {
+	public BoundProperty(TypeElement outerElement, BoundClass boundClass, Element enclosed, TypeMirror type,
+			String propertyName) {
 		this.outerElement = outerElement;
 		this.boundClass = boundClass;
 		this.enclosing = (TypeElement) enclosed.getEnclosingElement();
@@ -191,22 +192,39 @@ public class BoundProperty {
 	private String getInnerClassSuperClass(boolean replaceWildcards) {
 		// Arrays don't have individual binding classes
 		if (this.isArray()) {
-			return getConfig().bindingPathSuperClassName() + "<R, " + this.boundClass.get() + ", " + this.type.toString() + ">";
+			return getConfig().bindingPathSuperClassName() + "<R, " + this.boundClass.get() + ", "
+					+ this.type.toString() + ">";
 		}
-		// Being a generic type, we have no XxxBindingPath to extend, so just extend AbstractBinding directly
+		// Being a generic type, we have no XxxBindingPath to extend, so just
+		// extend AbstractBinding directly
 		if (this.isForGenericTypeParameter()) {
-			return getConfig().bindingPathSuperClassName() + "<R, " + this.boundClass.get() + ", " + this.getGenericElement() + ">";
+			return getConfig().bindingPathSuperClassName() + "<R, " + this.boundClass.get() + ", "
+					+ this.getGenericElement() + ">";
 		}
 
-		// if our type is outside the binding scope and no existing binding is available,
+		// if our type is outside the binding scope and no existing binding is
+		// available,
 		// we return a generic binding type
-		if (!this.shouldGenerateBindingClassForType()
-				&& !this.existsFieldTypeBindingFor() // check if type binding already exists ; if so, we can use it
-				) {
-			return GenericObjectBindingPath.class.getName() + "<R, " + this.boundClass.get() + ", " + this.type.toString() + ">";
+		if (!this.shouldGenerateBindingClassForType() && !this.existsFieldTypeBindingFor() // check
+																							// if
+																							// type
+																							// binding
+																							// already
+																							// exists
+																							// ;
+																							// if
+																							// so,
+																							// we
+																							// can
+																							// use
+																							// it
+		) {
+			return GenericObjectBindingPath.class.getName() + "<R, " + this.boundClass.get() + ", "
+					+ this.type.toString() + ">";
 		}
 
-		String superName = Util.lowerCaseOuterClassNames(this.element, getConfig().baseNameForBinding(this.name) + "BindingPath");
+		String superName = Util.lowerCaseOuterClassNames(this.element,
+				getConfig().baseNameForBinding(this.name) + "BindingPath");
 		List<String> typeArgs = Copy.list("R", this.boundClass.get());
 		if (this.isRawType()) {
 			for (TypeParameterElement tpe : this.getElement().getTypeParameters()) {

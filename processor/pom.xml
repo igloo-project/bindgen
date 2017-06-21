@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.bindgen</groupId>
 		<artifactId>bindgen-parent</artifactId>
-		<version>4.0-SNAPSHOT</version>
+		<version>4.0.0-SNAPSHOT</version>
 	</parent>
 	
 	<artifactId>bindgen</artifactId>
