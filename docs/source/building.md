@@ -1,8 +1,3 @@
----
-layout: default
-title: Building
----
-
 Building
 ========
 
@@ -63,4 +58,3 @@ Building `examples` in Maven
 To test the snapshot version of Bindgen, first in `bindgen` run `ant ivy.publish-maven-user` to get `bindgen-SNAPSHOT` into your `~/.m2/repository`.
 
 Now in `examples` run `mvn clean test`.
-

@@ -1,8 +1,3 @@
----
-layout: default
-title: Examples
----
-
 Examples
 ========
 
@@ -109,4 +104,3 @@ For example:
 </pre>
 
 By using the `getWithRoot`/`setWithRoot` methods, two threads can safely share a single `StringBinding` instance and not worry about stepping on each other's toes as one evaluates the binding against `f1` and the other evaluates it against `f2`.
-

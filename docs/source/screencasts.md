@@ -1,8 +1,3 @@
----
-layout: default
-title: Screencasts
----
-
 <script type="text/javascript" src="screencasts/swfobject.js"></script>
 <script type="text/javascript">
     swfobject.registerObject("csSWF", "9.0.115", "screencasts/expressInstall.swf");
@@ -11,7 +6,7 @@ title: Screencasts
 Screencasts
 ===========
 
-This screencast shows the details of how bindgen basically duplicates the effect type-safe anonymous inner classes. 
+This screencast shows the details of how bindgen basically duplicates the effect type-safe anonymous inner classes.
 
 <div id="media">
     <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="640" height="498" id="csSWF">
@@ -45,4 +40,3 @@ Note
 ----
 
 Per the [caveat](setup.html), Eclipse must be running *on* a JDK6 JVM for the annotation processing to work--it cannot be running on a JDK5 JVM and using the JDK6 compiler option.
-
