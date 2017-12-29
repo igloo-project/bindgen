@@ -4,7 +4,7 @@
 	
 	<artifactId>bindgen-parent</artifactId>
 	<groupId>org.bindgen</groupId>
-	<version>3.3-SNAPSHOT</version>
+	<version>3.2</version>
 	<packaging>pom</packaging>
 	
 	<name>Bindgen (parent)</name>
