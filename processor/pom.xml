@@ -5,12 +5,12 @@
 	<parent>
 		<groupId>org.bindgen</groupId>
 		<artifactId>bindgen-parent</artifactId>
-		<version>3.2-SNAPSHOT</version>
+		<version>3.2</version>
 	</parent>
 	
 	<artifactId>bindgen</artifactId>
 	<groupId>org.bindgen</groupId>
-	<version>3.2-SNAPSHOT</version>
+	<version>3.2</version>
 	
 	<name>Bindgen</name>
 
