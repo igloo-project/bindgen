@@ -4,7 +4,7 @@
 	
 	<artifactId>bindgen-parent</artifactId>
 	<groupId>org.bindgen</groupId>
-	<version>3.1.0</version>
+	<version>3.2</version>
 	<packaging>pom</packaging>
 	
 	<name>Bindgen (parent)</name>
@@ -55,9 +55,9 @@
 	</repositories>
 
 	<scm>
-		<url>git@github.com:openwide-java/bindgen.git</url>
-		<connection>scm:git:git@github.com:openwide-java/bindgen.git</connection>
-		<developerConnection>scm:git:git@github.com:openwide-java/bindgen.git</developerConnection>
+		<url>git@github.com:igloo-project/bindgen.git</url>
+		<connection>scm:git:git@github.com:igloo-project/bindgen.git</connection>
+		<developerConnection>scm:git:git@github.com:igloo-project/bindgen.git</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
 
@@ -66,19 +66,19 @@
 			<activation>
 				<property>
 					<name>distribution</name>
-					<value>owsi-core-release</value>
+					<value>kobalt-release</value>
 				</property>
 			</activation>
 			<distributionManagement>
 				<repository>
-					<id>nexus-owsi-core</id>
-					<name>Nexus OWSI Core</name>
-					<url>https://projects.openwide.fr/services/nexus/content/repositories/owsi-core</url>
+					<id>nexus-kobalt-releases</id>
+					<name>Nexus Kobalt Releases</name>
+					<url>https://nexus.tools.kobalt-si.fr/repository/kobalt-releases</url>
 				</repository>
 				<snapshotRepository>
-					<id>nexus-owsi-core-snapshots</id>
-					<name>Nexus OWSI Core Snapshots</name>
-					<url>https://projects.openwide.fr/services/nexus/content/repositories/owsi-core-snapshots</url>
+					<id>nexus-kobalt-snapshots</id>
+					<name>Nexus Kobalt Snapshots</name>
+					<url>https://nexus.tools.kobalt-si.fr/repository/kobalt-snapshots</url>
 				</snapshotRepository>
 			</distributionManagement>
 		</profile>
