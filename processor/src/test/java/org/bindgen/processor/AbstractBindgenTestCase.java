@@ -18,16 +18,16 @@ import java.util.Map.Entry;
 import javax.annotation.processing.Processor;
 import javax.tools.DiagnosticCollector;
 import javax.tools.JavaCompiler;
+import javax.tools.JavaCompiler.CompilationTask;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
-import javax.tools.JavaCompiler.CompilationTask;
-
-import joist.util.Join;
 
 import org.bindgen.Binding;
 import org.junit.Before;
 import org.junit.BeforeClass;
+
+import joist.util.Join;
 
 public class AbstractBindgenTestCase {
 
@@ -48,7 +48,7 @@ public class AbstractBindgenTestCase {
 	@Before
 	public void setup() {
 		this.output.mkdirs();
-		this.setScope("org.bindgen");
+		this.setScope("org.bindgen,java.lang");
 	}
 
 	protected ClassLoader compile(String... files) throws CompilationErrorException, IOException {
@@ -61,13 +61,9 @@ public class AbstractBindgenTestCase {
 			compilationUnits.add(new File("src/test/template/" + file));
 		}
 
-		CompilationTask task = COMPILER.getTask(
-			null,
-			fileManager,
-			diagnosticCollector,
-			this.compileProps("-d", this.output.getAbsolutePath()),
-			null,
-			fileManager.getJavaFileObjectsFromFiles(compilationUnits));
+		CompilationTask task = COMPILER.getTask(null, fileManager, diagnosticCollector,
+				this.compileProps("-d", this.output.getAbsolutePath()), null,
+				fileManager.getJavaFileObjectsFromFiles(compilationUnits));
 
 		task.setProcessors(Arrays.asList(new Processor[] { new org.bindgen.processor.Processor() }));
 
@@ -81,7 +77,8 @@ public class AbstractBindgenTestCase {
 			throw new CompilationErrorException(diagnosticCollector);
 		}
 
-		return new URLClassLoader(new URL[] { this.output.getAbsoluteFile().toURI().toURL() }, this.getClass().getClassLoader());
+		return new URLClassLoader(new URL[] { this.output.getAbsoluteFile().toURI().toURL() },
+				this.getClass().getClassLoader());
 	}
 
 	private List<String> compileProps(String... props) {
@@ -119,9 +116,8 @@ public class AbstractBindgenTestCase {
 	}
 
 	protected static void assertPackage(Method method) {
-		if ((method.getModifiers() & Modifier.PUBLIC) > 0
-			|| (method.getModifiers() & Modifier.PROTECTED) > 0
-			|| (method.getModifiers() & Modifier.PRIVATE) > 0) {
+		if ((method.getModifiers() & Modifier.PUBLIC) > 0 || (method.getModifiers() & Modifier.PROTECTED) > 0
+				|| (method.getModifiers() & Modifier.PRIVATE) > 0) {
 			fail();
 		}
 	}

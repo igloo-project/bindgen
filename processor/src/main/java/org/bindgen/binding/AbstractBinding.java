@@ -27,6 +27,10 @@ public class AbstractBinding<R, P, T> implements BindingRoot<R, T> {
 	public AbstractBinding() {
 	}
 
+	public AbstractBinding(String name, BindingRoot<R, P> parentBinding, Getter<P, T> getter, Setter<P, T> setter) {
+		this(name, Object.class, parentBinding, getter, setter);
+	}
+
 	public AbstractBinding(String name, Class<?> type, BindingRoot<R, P> parentBinding, Getter<P, T> getter,
 			Setter<P, T> setter) {
 		this.bindingName = name;

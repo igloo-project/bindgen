@@ -159,19 +159,24 @@ public class MethodPropertyGenerator implements PropertyGenerator {
 				type = "null";
 			}
 
+			String setterLambda = "null /* (item, value) -> item.{}(value) */";
+			if (this.hasSetterMethod()) {
+				setterLambda = "(item, value) -> item.{}(value)";
+			}
+
 			if (!this.property.shouldGenerateBindingClassForType() && !this.property.existsFieldTypeBindingFor()) {
 				fieldGet.body.line(
-						"    this.{} = new {}(\"{}\", {}, this, (item) -> item.{}(), null/*(item, value) -> item.{}(value)*/);",
+						String.format("    this.{} = new {}(\"{}\", {}, this, (item) -> item.{}(), %s);", setterLambda),
 						this.property.getName(), this.property.getInnerClassSuperClass(), this.property.getName(), type,
 						this.methodName, this.prefix.setterName(this.methodName));
 			} else if (this.property.isArray()) {
 				fieldGet.body.line(
-						"    this.{} = new {}(\"{}\", {}, this, (item) -> item.{}(), null/*(item, value) -> item.{}(value)*/);",
+						String.format("    this.{} = new {}(\"{}\", {}, this, (item) -> item.{}(), %s);", setterLambda),
 						this.property.getName(), this.property.getInnerClassSuperClass(), this.property.getName(), null,
 						this.methodName, this.prefix.setterName(this.methodName));
 			} else {
 				fieldGet.body.line(
-						"    this.{} = new {}(\"{}\", this, (item) -> item.{}(), null/*(item, value) -> item.{}(value)*/);",
+						String.format("    this.{} = new {}(\"{}\", this, (item) -> item.{}(), %s);", setterLambda),
 						this.property.getName(), this.property.getInnerClassSuperClass(), this.property.getName(),
 						this.methodName, this.prefix.setterName(this.methodName));
 			}

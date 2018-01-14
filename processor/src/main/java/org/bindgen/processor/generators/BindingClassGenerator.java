@@ -130,7 +130,7 @@ public class BindingClassGenerator {
 	private void addGetName() {
 		GMethod getName = this.pathBindingClass.getMethod("getName").returnType(String.class)
 				.addAnnotation("@Override");
-		getName.body.line("return \"\";");
+		getName.body.line("return this.bindingName;");
 	}
 
 	private void addGetType() {

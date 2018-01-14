@@ -27,8 +27,8 @@ public class FieldPropertyGenerator implements PropertyGenerator {
 	private final boolean isFinal;
 	private GClass innerClass;
 
-	public FieldPropertyGenerator(GClass outerClass, BoundClass boundClass, TypeElement outerElement, Element field, String propertyName)
-			throws WrongGeneratorException {
+	public FieldPropertyGenerator(GClass outerClass, BoundClass boundClass, TypeElement outerElement, Element field,
+			String propertyName) throws WrongGeneratorException {
 		this.outerClass = outerClass;
 		this.field = field;
 		this.fieldName = this.field.getSimpleName().toString();
@@ -45,6 +45,7 @@ public class FieldPropertyGenerator implements PropertyGenerator {
 		return true;
 	}
 
+	@Override
 	public void generate() {
 		this.addOuterClassGet();
 		this.addOuterClassBindingField();
