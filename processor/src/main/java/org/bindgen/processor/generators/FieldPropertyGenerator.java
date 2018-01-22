@@ -66,13 +66,67 @@ public class FieldPropertyGenerator implements PropertyGenerator {
 		this.outerClass.getField(this.property.getName()).type(this.property.getBindingClassFieldDeclaration());
 	}
 
-	private void addOuterClassGet() {
+	private void addOuterOldClassGet() {
 		GMethod fieldGet = this.outerClass.getMethod(this.property.getName() + "()");
 		fieldGet.setAccess(Util.getAccess(this.field));
 		fieldGet.returnType(this.property.getBindingClassFieldDeclaration());
 		fieldGet.body.line("if (this.{} == null) {", this.property.getName());
 		fieldGet.body.line("    this.{} = new {}();", this.property.getName(),
 				this.property.getBindingRootClassInstantiation());
+		fieldGet.body.line("}");
+		fieldGet.body.line("return this.{};", this.property.getName());
+	}
+
+	private void addOuterClassGet() {
+		String bindingType = this.property.getInnerClassSuperClass();
+		GMethod fieldGet = this.outerClass.getMethod(this.property.getName() + "()");
+		fieldGet.setAccess(Util.getAccess(this.field));
+		fieldGet.returnType(this.property.getBindingClassFieldDeclaration());
+		if (bindingType.contains("U1")) {
+			fieldGet.typeParameters("U0, U1");
+		} else if (bindingType.contains("U0")) {
+			fieldGet.typeParameters("U0");
+		}
+		fieldGet.body.line("if (this.{} == null) {", this.property.getName());
+
+		String type;
+		if (this.property.isForGenericTypeParameter() || this.property.isArray()) {
+			type = "null";
+		} else if (!this.property.shouldGenerateBindingClassForType()) {
+			// since no binding class will be generated for the return type
+			// of
+			// this method we may not inherit getType() in MyBinding class
+			// (if,
+			// for example, MyBinding extends GenericObjectBindingPath) and
+			// so
+			// we have to implement it ouselves
+			type = String.format("%s.class", this.property.getReturnableType());
+		} else {
+			type = "null";
+		}
+
+		String setterLambda = "null /* (item, value) -> item.{}(value) */";
+		// if (this.hasSetterMethod()) {
+		// setterLambda = "(item, value) -> item.{}(value)";
+		// }
+		setterLambda = "(item, value) -> item.{} = value";
+
+		if (!this.property.shouldGenerateBindingClassForType() && !this.property.existsFieldTypeBindingFor()) {
+			fieldGet.body.line(
+					String.format("    this.{} = new {}(\"{}\", {}, this, (item) -> item.{}, %s);", setterLambda),
+					this.property.getName(), this.property.getInnerClassSuperClass(), this.property.getName(), type,
+					this.fieldName, this.fieldName);
+		} else if (this.property.isArray()) {
+			fieldGet.body.line(
+					String.format("    this.{} = new {}(\"{}\", {}, this, (item) -> item.{}, %s);", setterLambda),
+					this.property.getName(), this.property.getInnerClassSuperClass(), this.property.getName(), null,
+					this.fieldName, this.fieldName);
+		} else {
+			fieldGet.body.line(
+					String.format("    this.{} = new {}(\"{}\", this, (item) -> item.{}, %s);", setterLambda),
+					this.property.getName(), this.property.getInnerClassSuperClass(), this.property.getName(),
+					this.fieldName, this.fieldName);
+		}
 		fieldGet.body.line("}");
 		fieldGet.body.line("return this.{};", this.property.getName());
 	}

@@ -1,15 +1,15 @@
 package org.bindgen.example.methods;
 
+import org.bindgen.java.lang.StringBindingPath;
+
 import junit.framework.Assert;
 import junit.framework.TestCase;
-
-import org.bindgen.java.lang.StringBindingPath;
 
 public class MethodExampleStatelessTest extends TestCase {
 
 	public void testReadWrite() {
 		MethodExampleBinding b = new MethodExampleBinding();
-		StringBindingPath<MethodExample> name = b.name();
+		StringBindingPath<MethodExample, MethodExample> name = b.name();
 
 		MethodExample e1 = new MethodExample("1", "fred");
 		MethodExample e2 = new MethodExample("2", "bob");

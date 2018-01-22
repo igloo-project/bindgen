@@ -88,8 +88,7 @@ public class BindingClassGenerator {
 				new Argument(String.format("%s<R, P>", BindingRoot.class.getName()), "parentBinding"),
 				new Argument(String.format("%s<P, %s>", Getter.class.getName(), this.name.get().toString()), "getter"),
 				new Argument(String.format("%s<P, %s>", Setter.class.getName(), this.name.get().toString()), "setter"))
-				.setBody("this.bindingName = name;\n" + "this.bindingParentBinding = parentBinding;\n"
-						+ "this.bindingGetter = getter;\n" + "this.bindingSetter = setter;\n");
+				.setBody("super(name, parentBinding, getter, setter);\n");
 	}
 
 	private void initializeRootBindingClass() {
