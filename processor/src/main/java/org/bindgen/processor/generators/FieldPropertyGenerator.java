@@ -18,18 +18,16 @@ import joist.sourcegen.GMethod;
 /**
  * Generates bindings for fields
  */
-public class FieldPropertyGenerator implements PropertyGenerator {
+public class FieldPropertyGenerator extends AbstractGenerator implements PropertyGenerator {
 
-	private final GClass outerClass;
 	private final Element field;
 	private final String fieldName;
 	private final BoundProperty property;
 	private final boolean isFinal;
-	private GClass innerClass;
 
 	public FieldPropertyGenerator(GClass outerClass, BoundClass boundClass, TypeElement outerElement, Element field,
 			String propertyName) throws WrongGeneratorException {
-		this.outerClass = outerClass;
+		super(outerClass);
 		this.field = field;
 		this.fieldName = this.field.getSimpleName().toString();
 
@@ -46,23 +44,25 @@ public class FieldPropertyGenerator implements PropertyGenerator {
 	}
 
 	@Override
-	public void generate() {
-		this.addOuterClassGet();
-		this.addOuterClassBindingField();
-		this.addInnerClass();
-		this.addInnerClassGetName();
-		this.addInnerClassGetParent();
-		this.addInnerClassGet();
-		this.addInnerClassGetWithRoot();
-		this.addInnerClassGetSafelyWithRoot();
-		this.addInnerClassSet();
-		this.addInnerClassSetWithRoot();
-		this.addInnerClassGetContainedTypeIfNeeded();
-		this.addInnerClassSerialVersionUID();
-		this.addInnerClassIsReadOnlyOverrideIfNeeded();
+	protected void generateInner() {
+		if (this.property.name.getDeclaredType() != null
+				&& !this.property.name.getDeclaredType().getTypeArguments().isEmpty()) {
+			this.addInnerClass();
+			this.addInnerClassGetName();
+			this.addInnerClassGetParent();
+			this.addInnerClassGet();
+			this.addInnerClassGetWithRoot();
+			this.addInnerClassGetSafelyWithRoot();
+			this.addInnerClassSet();
+			this.addInnerClassSetWithRoot();
+			this.addInnerClassGetContainedTypeIfNeeded();
+			this.addInnerClassSerialVersionUID();
+			this.addInnerClassIsReadOnlyOverrideIfNeeded();
+		}
 	}
 
-	private void addOuterClassBindingField() {
+	@Override
+	protected void addOuterClassBindingField() {
 		this.outerClass.getField(this.property.getName()).type(this.property.getBindingClassFieldDeclaration());
 	}
 
@@ -77,7 +77,8 @@ public class FieldPropertyGenerator implements PropertyGenerator {
 		fieldGet.body.line("return this.{};", this.property.getName());
 	}
 
-	private void addOuterClassGet() {
+	@Override
+	protected void addOuterClassGet() {
 		if (this.property.name.getDeclaredType() != null
 				&& !this.property.name.getDeclaredType().getTypeArguments().isEmpty()) {
 			this.addOuterOldClassGet();

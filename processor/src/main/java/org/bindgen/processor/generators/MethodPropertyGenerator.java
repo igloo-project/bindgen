@@ -28,23 +28,21 @@ import joist.sourcegen.GMethod;
  * Generates bindings for method properties like getFoo/setFoo, foo/foo(), with
  * setters being optional.
  */
-public class MethodPropertyGenerator implements PropertyGenerator {
+public class MethodPropertyGenerator extends AbstractGenerator implements PropertyGenerator {
 
 	private final TypeElement outerElement;
-	private final BoundClass boundClass;
+	protected final BoundClass boundClass;
 	private final AccessorPrefix prefix;
-	private final GClass outerClass;
 	private final ExecutableElement method;
 	private final String methodName;
 	private final BoundProperty property;
-	private GClass innerClass;
 
 	public MethodPropertyGenerator(GClass outerClass, BoundClass boundClass, TypeElement outerElement,
 			ExecutableElement method, ExecutableType inContext, AccessorPrefix prefix, String propertyName)
 			throws WrongGeneratorException {
+		super(outerClass);
 		this.outerElement = outerElement;
 		this.boundClass = boundClass;
-		this.outerClass = outerClass;
 		this.method = method;
 		this.methodName = method.getSimpleName().toString();
 		this.prefix = prefix;
@@ -55,9 +53,7 @@ public class MethodPropertyGenerator implements PropertyGenerator {
 		}
 	}
 
-	public void generate() {
-		this.addOuterClassGet();
-		this.addOuterClassBindingField();
+	public void generateInner() {
 		if (this.property.name.getDeclaredType() != null
 				&& !this.property.name.getDeclaredType().getTypeArguments().isEmpty()) {
 			this.addInnerClass();
@@ -120,7 +116,8 @@ public class MethodPropertyGenerator implements PropertyGenerator {
 		return ((ExecutableType) this.method.asType()).getReturnType().getKind() == TypeKind.VOID;
 	}
 
-	private void addOuterClassGet() {
+	@Override
+	protected void addOuterClassGet() {
 		if (this.property.name.getDeclaredType() != null
 				&& !this.property.name.getDeclaredType().getTypeArguments().isEmpty()) {
 			GMethod fieldGet = this.outerClass.getMethod(this.property.getName() + "()");
@@ -176,7 +173,8 @@ public class MethodPropertyGenerator implements PropertyGenerator {
 		}
 	}
 
-	private void addOuterClassBindingField() {
+	@Override
+	protected void addOuterClassBindingField() {
 		this.outerClass.getField(this.property.getName()).type(this.property.getBindingClassFieldDeclaration());
 	}
 

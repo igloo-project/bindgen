@@ -125,24 +125,38 @@ public class BindingClassGenerator {
 				.setBody("super(type);\n");
 	}
 
+	/**
+	 * TypeBinding class declaration.
+	 */
 	private void initializeRootBindingClass() {
 		this.rootBindingClass = new GClass(this.name.getBindingRootClassDeclaration());
 		this.rootBindingClass.baseClassName(this.name.getBindingRootClassSuperClass());
+		// TODO: try to generate code without warning
 		this.rootBindingClass.addAnnotation("@SuppressWarnings(\"all\")");
 	}
 
+	/**
+	 * getWithRoot() custom method implementation (return root instead of calling
+	 * parent binding)
+	 */
 	private void addGetWithRoot() {
 		GMethod getWithRoot = this.rootBindingClass.getMethod("getWithRoot").argument(this.name.get(), "root")
 				.returnType(this.name.get());
 		getWithRoot.body.line("return root;");
 	}
 
+	/**
+	 * @see BindingClassGenerator#addGetWithRoot()
+	 */
 	private void addGetSafelyWithRoot() {
 		GMethod getSafelyWithRoot = this.rootBindingClass.getMethod("getSafelyWithRoot")
 				.argument(this.name.get(), "root").returnType(this.name.get());
 		getSafelyWithRoot.body.line("return root;");
 	}
 
+	/**
+	 * Add generation's time information
+	 */
 	private void addGeneratedTimestamp() {
 		if (getConfig().skipGeneratedTimestamps()) {
 			return;
@@ -177,6 +191,9 @@ public class BindingClassGenerator {
 		}
 	}
 
+	/**
+	 * Add type to generation queue
+	 */
 	private void enqueuePropertyTypeIfNeeded(PropertyGenerator pg) {
 		for (TypeElement te : pg.getPropertyTypeElements()) {
 			if (te != null && getConfig().shouldGenerateBindingFor(te)) {
@@ -185,12 +202,18 @@ public class BindingClassGenerator {
 		}
 	}
 
+	/**
+	 * Add to subBindings (used to generate binding list)
+	 */
 	private void addToSubBindingsIfNeeded(PropertyGenerator pg) {
 		if (pg.hasSubBindings()) {
 			this.foundSubBindings.add(pg.getPropertyName());
 		}
 	}
 
+	/**
+	 * Add method that provides binding list
+	 */
 	private void addGetChildBindings() {
 		this.pathBindingClass.addImports(Binding.class, List.class);
 		GMethod children = this.pathBindingClass.getMethod("getChildBindings").returnType("List<Binding<?>>")

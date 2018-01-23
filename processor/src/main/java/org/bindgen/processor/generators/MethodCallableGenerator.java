@@ -17,26 +17,24 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Types;
 
-import joist.sourcegen.GClass;
-import joist.sourcegen.GMethod;
-import joist.util.Inflector;
-
 import org.bindgen.NamedBinding;
 import org.bindgen.processor.CurrentEnv;
 import org.bindgen.processor.util.BoundClass;
 import org.bindgen.processor.util.Util;
 
-public class MethodCallableGenerator implements PropertyGenerator {
+import joist.sourcegen.GClass;
+import joist.sourcegen.GMethod;
+import joist.util.Inflector;
 
-	private final GClass outerClass;
+public class MethodCallableGenerator extends AbstractGenerator implements PropertyGenerator {
+
 	private final ExecutableElement method;
 	private final String methodName;
 	private TypeElement blockType;
 	private ExecutableElement blockMethod;
-	private GClass innerClass;
 
 	public MethodCallableGenerator(GClass outerClass, ExecutableElement method) throws WrongGeneratorException {
-		this.outerClass = outerClass;
+		super(outerClass);
 		this.method = method;
 		this.methodName = this.method.getSimpleName().toString();
 		if (!this.shouldGenerate()) {
@@ -61,9 +59,7 @@ public class MethodCallableGenerator implements PropertyGenerator {
 		return false;
 	}
 
-	public void generate() {
-		this.addOuterClassGet();
-		this.addOuterClassField();
+	protected void generateInner() {
 		this.addInnerClass();
 		this.addInnerClassMethod();
 		this.addInnerClassGetName();
@@ -81,8 +77,7 @@ public class MethodCallableGenerator implements PropertyGenerator {
 		}
 		ExecutableElement methodToMatch = methods.get(0);
 		if (this.doBlockReturnTypesMatch(methodToMatch) //
-			&& this.doBlockParamsMatch(methodToMatch)
-			&& this.doBlockThrowsMatch(methodToMatch)) {
+				&& this.doBlockParamsMatch(methodToMatch) && this.doBlockThrowsMatch(methodToMatch)) {
 			this.blockType = attemptType;
 			this.blockMethod = methodToMatch;
 			return true;
@@ -90,12 +85,15 @@ public class MethodCallableGenerator implements PropertyGenerator {
 		return false;
 	}
 
-	private void addOuterClassField() {
+	@Override
+	protected void addOuterClassBindingField() {
 		this.outerClass.getField(this.methodName).type(this.blockType.getQualifiedName().toString());
 	}
 
-	private void addOuterClassGet() {
-		GMethod get = this.outerClass.getMethod(this.methodName).returnType(this.blockType.getQualifiedName().toString());
+	@Override
+	protected void addOuterClassGet() {
+		GMethod get = this.outerClass.getMethod(this.methodName)
+				.returnType(this.blockType.getQualifiedName().toString());
 		get.setAccess(Util.getAccess(this.method));
 		get.body.line("if (this.{} == null) {", this.methodName);
 		get.body.line("    this.{} = new My{}Binding();", this.methodName, Inflector.capitalize(this.methodName));
@@ -104,7 +102,8 @@ public class MethodCallableGenerator implements PropertyGenerator {
 	}
 
 	private void addInnerClass() {
-		this.innerClass = this.outerClass.getInnerClass("My{}Binding", Inflector.capitalize(this.methodName)).notStatic();
+		this.innerClass = this.outerClass.getInnerClass("My{}Binding", Inflector.capitalize(this.methodName))
+				.notStatic();
 		this.innerClass.setAccess(Util.getAccess(this.method));
 		this.innerClass.implementsInterface(this.blockType.getQualifiedName().toString());
 		this.innerClass.implementsInterface(NamedBinding.class);
@@ -113,11 +112,8 @@ public class MethodCallableGenerator implements PropertyGenerator {
 	private void addInnerClassMethod() {
 		GMethod run = this.innerClass.getMethod(this.blockMethod.getSimpleName().toString());
 		run.returnType(this.blockMethod.getReturnType().toString());
-		run.body.line("{}{}.this.get().{}({});",//
-			this.getReturnPrefixIfNeeded(),
-			this.outerClass.getSimpleName(),
-			this.methodName,
-			this.getArguments());
+		run.body.line("{}{}.this.get().{}({});", //
+				this.getReturnPrefixIfNeeded(), this.outerClass.getSimpleName(), this.methodName, this.getArguments());
 		this.addMethodParameters(run);
 		this.addMethodThrows(run);
 	}
@@ -151,7 +147,8 @@ public class MethodCallableGenerator implements PropertyGenerator {
 		}
 		Types typeUtils = CurrentEnv.getTypeUtils();
 		for (int i = 0; i < methodToMatch.getParameters().size(); i++) {
-			if (!typeUtils.isSameType(methodToMatch.getParameters().get(i).asType(), this.getMethodAsType().getParameterTypes().get(i))) {
+			if (!typeUtils.isSameType(methodToMatch.getParameters().get(i).asType(),
+					this.getMethodAsType().getParameterTypes().get(i))) {
 				return false;
 			}
 		}
@@ -208,13 +205,14 @@ public class MethodCallableGenerator implements PropertyGenerator {
 
 	public static class Factory implements GeneratorFactory {
 		@Override
-		public MethodCallableGenerator newGenerator(GClass outerClass, BoundClass boundClass, TypeElement outerElement, Element possibleMethod, Collection<String> namesTaken) throws WrongGeneratorException {
+		public MethodCallableGenerator newGenerator(GClass outerClass, BoundClass boundClass, TypeElement outerElement,
+				Element possibleMethod, Collection<String> namesTaken) throws WrongGeneratorException {
 			if (possibleMethod.getKind() != ElementKind.METHOD) {
 				throw new WrongGeneratorException();
 			}
 			MethodCallableGenerator pg = new MethodCallableGenerator(outerClass, (ExecutableElement) possibleMethod);
 			if (namesTaken.contains(pg.getPropertyName())) {
-				throw new WrongGeneratorException(); // do not generate bindings with compilation errors 
+				throw new WrongGeneratorException(); // do not generate bindings with compilation errors
 			}
 
 			return pg;
