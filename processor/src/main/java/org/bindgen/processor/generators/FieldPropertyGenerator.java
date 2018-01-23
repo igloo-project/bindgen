@@ -96,17 +96,8 @@ public class FieldPropertyGenerator implements PropertyGenerator {
 			String type;
 			if (this.property.isForGenericTypeParameter() || this.property.isArray()) {
 				type = "null";
-			} else if (!this.property.shouldGenerateBindingClassForType()) {
-				// since no binding class will be generated for the return type
-				// of
-				// this method we may not inherit getType() in MyBinding class
-				// (if,
-				// for example, MyBinding extends GenericObjectBindingPath) and
-				// so
-				// we have to implement it ouselves
-				type = String.format("%s.class", this.property.getReturnableType());
 			} else {
-				type = "null";
+				type = String.format("%s.class", this.property.getReturnableType());
 			}
 
 			String setterLambda = "null /* (item, value) -> item.{}(value) */";
@@ -119,7 +110,7 @@ public class FieldPropertyGenerator implements PropertyGenerator {
 				setterLambda = null;
 			}
 
-			if (!this.property.shouldGenerateBindingClassForType() && !this.property.existsFieldTypeBindingFor()) {
+			if (!"null".equals(type)) {
 				fieldGet.body.line(
 						String.format("    this.{} = new {}(\"{}\", {}, this, (item) -> item.{}, %s);", setterLambda),
 						this.property.getName(), this.property.getInnerClassSuperClass(), this.property.getName(), type,

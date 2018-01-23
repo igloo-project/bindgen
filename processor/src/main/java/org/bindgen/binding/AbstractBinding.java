@@ -24,7 +24,11 @@ public class AbstractBinding<R, P, T> implements BindingRoot<R, T> {
 
 	protected T _value;
 
-	public AbstractBinding() {
+	protected AbstractBinding() {
+	}
+
+	public AbstractBinding(Class<?> type) {
+		this(null, type, null, null, null);
 	}
 
 	public AbstractBinding(String name, BindingRoot<R, P> parentBinding, Getter<P, T> getter, Setter<P, T> setter) {
@@ -34,10 +38,10 @@ public class AbstractBinding<R, P, T> implements BindingRoot<R, T> {
 	public AbstractBinding(String name, Class<?> type, BindingRoot<R, P> parentBinding, Getter<P, T> getter,
 			Setter<P, T> setter) {
 		this.bindingName = name;
+		this.bindingType = type;
 		this.bindingParentBinding = parentBinding;
 		this.bindingGetter = getter;
 		this.bindingSetter = setter;
-		this.bindingType = type;
 	}
 
 	@Override

@@ -146,17 +146,8 @@ public class MethodPropertyGenerator implements PropertyGenerator {
 			String type;
 			if (this.property.isForGenericTypeParameter() || this.property.isArray()) {
 				type = "null";
-			} else if (!this.property.shouldGenerateBindingClassForType()) {
-				// since no binding class will be generated for the return type
-				// of
-				// this method we may not inherit getType() in MyBinding class
-				// (if,
-				// for example, MyBinding extends GenericObjectBindingPath) and
-				// so
-				// we have to implement it ouselves
-				type = String.format("%s.class", this.property.getReturnableType());
 			} else {
-				type = "null";
+				type = String.format("%s.class", this.property.getReturnableType());
 			}
 
 			String setterLambda = "null /* (item, value) -> item.{}(value) */";

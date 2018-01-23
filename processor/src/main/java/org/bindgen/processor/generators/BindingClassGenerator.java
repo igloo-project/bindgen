@@ -62,15 +62,24 @@ public class BindingClassGenerator {
 	}
 
 	public void generate() {
+		// initialize class declaration (*BindingPath)
 		this.initializePathBindingClass();
-		this.addGetName();
-		this.addGetType();
+		// managed at abstract level ; name provided at binding generation time
+		// this.addGetName();
+		// this.addGetType();
+
+		// add all properties methods
 		this.addProperties();
+		// add getter that provides property list
 		this.addGetChildBindings();
 
+		// initialize class declaration (*Binding)
 		this.initializeRootBindingClass();
+		// add constructors
 		this.addConstructors();
+		// add getWithRoot method
 		this.addGetWithRoot();
+		// add getSafelyWithRoot method
 		this.addGetSafelyWithRoot();
 
 		this.addGeneratedTimestamp();
@@ -79,16 +88,41 @@ public class BindingClassGenerator {
 		this.saveCode(this.rootBindingClass);
 	}
 
+	/**
+	 * Initialize a BindingPath class for the current type; BindingPath is a
+	 * root-less Binding.
+	 */
 	private void initializePathBindingClass() {
+		// class name
 		this.pathBindingClass = new GClass(this.name.getBindingPathClassDeclaration());
+		// parent class; may be provided by configuration
 		this.pathBindingClass.baseClassName(this.name.getBindingPathClassSuperClass());
+		// TODO: try to generate code without warning
 		this.pathBindingClass.addAnnotation("@SuppressWarnings(\"all\")");
-		this.pathBindingClass.getConstructor();
+		// add a protected no-args constructor
+		this.pathBindingClass.getConstructor().setProtected();
+		// add a complete constructor
+		// - String name
+		// - Class<?> type
+		// - BindingRoot<P, R> parentBinding,
+		// - Getter<P, T> getter
+		// - Setter<P, T> setter
+		// call parent constructor with same args
+		this.pathBindingClass.getConstructor(new Argument(String.class.getName(), "name"),
+				new Argument(String.format("%s<?>", Class.class.getName()), "type"),
+				new Argument(String.format("%s<R, P>", BindingRoot.class.getName()), "parentBinding"),
+				new Argument(String.format("%s<P, %s>", Getter.class.getName(), this.name.get().toString()), "getter"),
+				new Argument(String.format("%s<P, %s>", Setter.class.getName(), this.name.get().toString()), "setter"))
+				.setBody("super(name, type, parentBinding, getter, setter);\n");
+		// another constructor without type argument
 		this.pathBindingClass.getConstructor(new Argument(String.class.getName(), "name"),
 				new Argument(String.format("%s<R, P>", BindingRoot.class.getName()), "parentBinding"),
 				new Argument(String.format("%s<P, %s>", Getter.class.getName(), this.name.get().toString()), "getter"),
 				new Argument(String.format("%s<P, %s>", Setter.class.getName(), this.name.get().toString()), "setter"))
 				.setBody("super(name, parentBinding, getter, setter);\n");
+		// same only with type
+		this.pathBindingClass.getConstructor(new Argument(String.format("%s<?>", Class.class.getName()), "type"))
+				.setBody("super(type);\n");
 	}
 
 	private void initializeRootBindingClass() {
@@ -121,23 +155,20 @@ public class BindingClassGenerator {
 		this.rootBindingClass.addAnnotation("@Generated(value = \"" + value + "\", date = \"" + date + "\")");
 	}
 
+	/**
+	 * Two constructors: root-less (noargs) or root-aware (one-arg); type is passed
+	 * to parent constructor
+	 */
 	private void addConstructors() {
-		this.rootBindingClass.getConstructor();
-		this.rootBindingClass.getConstructor(this.name.get() + " value").body.line("this.set(value);");
+		this.rootBindingClass.getConstructor().body.line("super({}.class);\n", this.name.getTypeWithoutGenerics());
+		GMethod constructor = this.rootBindingClass.getConstructor(this.name.get() + " value");
+		constructor.body.line("super({}.class);", this.name.getTypeWithoutGenerics());
+		constructor.body.line("this.set(value);");
 	}
 
-	private void addGetName() {
-		// GMethod getName =
-		// this.pathBindingClass.getMethod("getName").returnType(String.class)
-		// .addAnnotation("@Override");
-		// getName.body.line("return this.bindingName;");
-	}
-
-	private void addGetType() {
-		GMethod getType = this.pathBindingClass.getMethod("getType").returnType("Class<?>").addAnnotation("@Override");
-		getType.body.line("return {}.class;", this.element.toString());
-	}
-
+	/**
+	 * Process all properties: propertyName() methods
+	 */
 	private void addProperties() {
 		for (PropertyGenerator pg : this.getPropertyGenerators()) {
 			pg.generate();

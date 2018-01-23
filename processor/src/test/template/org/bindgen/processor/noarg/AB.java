@@ -11,6 +11,10 @@ public class AB<R, P, T> extends AbstractBinding<R, P, T> {
 		super();
 	}
 
+	public AB(Class<?> type) {
+		super(type);
+	}
+
 	public AB(String name, BindingRoot<R, P> parentBinding, Getter<P, T> getter, Setter<P, T> setter) {
 		super(name, parentBinding, getter, setter);
 	}

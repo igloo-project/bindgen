@@ -52,7 +52,8 @@ public class BoundClass {
 		if (this.name.getGenericsWithBounds().size() == 0) {
 			return this.getBindingClassName().getWithoutGenericPart();
 		} else {
-			return this.getBindingClassName().getWithoutGenericPart() + "<" + Join.commaSpace(this.name.getGenericsWithBounds()) + ">";
+			return this.getBindingClassName().getWithoutGenericPart() + "<"
+					+ Join.commaSpace(this.name.getGenericsWithBounds()) + ">";
 		}
 	}
 
@@ -63,12 +64,23 @@ public class BoundClass {
 		return this.getBindingClassName().getWithoutGenericPart() + "Path" + "<" + Join.commaSpace(typeArgs) + ">";
 	}
 
-	/** @return "com.app.Type<String, String>" if the type is "com.app.Type<String, String>" */
+	public String getTypeWithoutGenerics() {
+		// may include OuterType: example OuterType.InnerType
+		return this.name.getWithoutGenericPart();
+	}
+
+	/**
+	 * @return "com.app.Type<String, String>" if the type is "com.app.Type<String,
+	 *         String>"
+	 */
 	public String get() {
 		return this.name.get();
 	}
 
-	/** @return "com.app.Type<String, String>" if the type is "com.app.Type<String, String>" */
+	/**
+	 * @return "com.app.Type<String, String>" if the type is "com.app.Type<String,
+	 *         String>"
+	 */
 	public String toString() {
 		return this.name.get();
 	}
