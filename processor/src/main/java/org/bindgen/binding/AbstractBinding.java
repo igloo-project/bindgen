@@ -78,7 +78,7 @@ public class AbstractBinding<R, P, T> implements BindingRoot<R, T> {
 
 	@Override
 	public Binding<?> getParentBinding() {
-		return null;
+		return this.bindingParentBinding;
 	}
 
 	@Override
@@ -142,7 +142,7 @@ public class AbstractBinding<R, P, T> implements BindingRoot<R, T> {
 
 	@Override
 	public boolean getBindingIsReadOnly() {
-		return this.bindingParentBinding == null || this.bindingSetter != null;
+		return this.bindingParentBinding != null && this.bindingSetter == null;
 	}
 
 	@Override
