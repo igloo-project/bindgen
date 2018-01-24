@@ -16,16 +16,12 @@
 		<dependency>
 			<groupId>joist</groupId>
 			<artifactId>joist-util</artifactId>
-			<version>1.4.17</version>
 		</dependency>
 		
 		<!-- Test dependencies -->
-		
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<scope>test</scope>
-			<version>4.11</version>
 		</dependency>
 	</dependencies>
 

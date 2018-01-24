@@ -9,10 +9,39 @@
 
 	<name>Bindgen (parent)</name>
 
+	<properties>
+		<bindgen.java.version>1.8</bindgen.java.version>
+		
+		<maven.jgitflow.version>1.0-m5.1</maven.jgitflow.version>
+		<maven.compiler.version>3.6.0</maven.compiler.version>
+		<maven.processor.version>3.3.2</maven.processor.version>
+		<maven.deploy.version>2.8.2</maven.deploy.version>
+		
+		<joist.version>1.4.17</joist.version>
+		<junit.version>4.11</junit.version>
+	</properties>
+
 	<modules>
 		<module>processor</module>
 		<module>examples</module>
 	</modules>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>joist</groupId>
+				<artifactId>joist-util</artifactId>
+				<version>${joist.version}</version>
+			</dependency>
+		
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<scope>test</scope>
+				<version>${junit.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<build>
 		<pluginManagement>
@@ -20,7 +49,7 @@
 				<plugin>
 					<groupId>external.atlassian.jgitflow</groupId>
 					<artifactId>jgitflow-maven-plugin</artifactId>
-					<version>1.0-m5.1</version>
+					<version>${maven.jgitflow.version}</version>
 					<configuration>
 						<autoVersionSubmodules>true</autoVersionSubmodules>
 						<flowInitContext>
@@ -35,13 +64,44 @@
 				</plugin>
 				<plugin>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.6.0</version>
+					<version>${maven.compiler.version}</version>
 					<configuration>
-						<source>1.8</source>
-						<target>1.8</target>
+						<source>${bindgen.java.version}</source>
+						<target>${bindgen.java.version}</target>
 						<compilerArgument>-proc:none</compilerArgument>
 						<testCompilerArgument>-proc:none</testCompilerArgument>
 					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.bsc.maven</groupId>
+					<artifactId>maven-processor-plugin</artifactId>
+					<version>${maven.processor.version}</version>
+					<configuration>
+						<processors>
+							<processor>org.bindgen.processor.Processor</processor>
+						</processors>
+					</configuration>
+					<executions>
+						<execution>
+							<id>maven-processor-plugin-default</id>
+							<phase>generate-sources</phase>
+							<goals>
+								<goal>process</goal>
+							</goals>
+						</execution>
+					</executions>
+					<dependencies>
+						<dependency>
+							<groupId>org.bindgen</groupId>
+							<artifactId>bindgen</artifactId>
+							<version>${project.version}</version>
+						</dependency>
+					</dependencies>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-deploy-plugin</artifactId>
+					<version>${maven.deploy.version}</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -66,7 +126,7 @@
 			<activation>
 				<property>
 					<name>distribution</name>
-					<value>kobalt-release</value>
+					<value>igloo</value>
 				</property>
 			</activation>
 			<distributionManagement>
