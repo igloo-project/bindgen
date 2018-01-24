@@ -8,6 +8,7 @@ public class AccessBean {
 	public String publicField;
 	protected String protectedField;
 	String packageField;
+	@SuppressWarnings("unused")
 	private String privateField;
 
 	private String publicMethod;
@@ -39,10 +40,12 @@ public class AccessBean {
 		this.packageMethod = packageMethod;
 	}
 
+	@SuppressWarnings("unused")
 	private String getPrivateMethod() {
 		return this.privateMethod;
 	}
 
+	@SuppressWarnings("unused")
 	private void setPrivateMethod(String privateMethod) {
 		this.privateMethod = privateMethod;
 	}

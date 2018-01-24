@@ -59,6 +59,7 @@ public class MethodCallableGenerator extends AbstractGenerator implements Proper
 		return false;
 	}
 
+	@Override
 	protected void generateInner() {
 		this.addInnerClass();
 		this.addInnerClassMethod();

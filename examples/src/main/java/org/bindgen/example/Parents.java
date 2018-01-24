@@ -12,6 +12,7 @@ public class Parents {
 			return "baz";
 		}
 
+		@Override
 		public String toString() {
 			return "foo";
 		}
@@ -21,6 +22,7 @@ public class Parents {
 	public static class FooChild {
 		public Foo foo;
 
+		@Override
 		public String toString() {
 			return "child";
 		}

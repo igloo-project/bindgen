@@ -53,6 +53,7 @@ public class MethodPropertyGenerator extends AbstractGenerator implements Proper
 		}
 	}
 
+	@Override
 	public void generateInner() {
 		if (this.property.name.getDeclaredType() != null
 				&& !this.property.name.getDeclaredType().getTypeArguments().isEmpty()) {

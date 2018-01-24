@@ -8,32 +8,32 @@ import org.bindgen.Bindable;
 public class RawTypesExample {
 
 	public Enumeration<String> fieldGiven;
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Enumeration fieldRaw;
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Enumeration fieldFixed;
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	private Enumeration methodRaw;
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	private Enumeration methodFixed;
 	private Enumeration<String> methodGiven;
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Enumeration getMethodFixed() {
 		return this.methodFixed;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public void setMethodFixed(Enumeration e) {
 		this.methodFixed = e;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Enumeration getMethodRaw() {
 		return this.methodRaw;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public void setMethodRaw(Enumeration e) {
 		this.methodRaw = e;
 	}

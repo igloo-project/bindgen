@@ -5,6 +5,7 @@ public class SubExample extends BaseExample {
 	public String name;
 	public String subOnly;
 
+	@Override
 	public SubExampleBinding getBinding() {
 		return new SubExampleBinding(this);
 	}

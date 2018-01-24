@@ -231,6 +231,7 @@ public class FieldPropertyGenerator extends AbstractGenerator implements Propert
 		return Util.collectTypeElements(this.property.getType());
 	}
 
+	@Override
 	public String getPropertyName() {
 		return this.property.getName();
 	}

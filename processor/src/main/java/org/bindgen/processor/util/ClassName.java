@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
 
 /**
@@ -30,6 +31,7 @@ public class ClassName {
 		return this.fullClassNameWithGenerics;
 	}
 
+	@Override
 	public String toString() {
 		return this.get();
 	}
@@ -62,7 +64,7 @@ public class ClassName {
 	 */
 	public List<String> getGenericsWithoutBounds() {
 		List<String> args = new ArrayList<String>();
-		for (TypeVariable tv : (List<TypeVariable>) this.getDeclaredType().getTypeArguments()) {
+		for (TypeMirror tv : this.getDeclaredType().getTypeArguments()) {
 			args.add(tv.toString());
 		}
 		return args;
@@ -74,7 +76,9 @@ public class ClassName {
 	 */
 	public List<String> getGenericsWithBounds() {
 		List<String> args = new ArrayList<String>();
-		for (TypeVariable tv : (List<TypeVariable>) this.getDeclaredType().getTypeArguments()) {
+		@SuppressWarnings("unchecked")
+		List<TypeVariable> typeVariables = (List<TypeVariable>) this.getDeclaredType().getTypeArguments();
+		for (TypeVariable tv : typeVariables) {
 			String arg = tv.toString();
 			if (!Util.isOfTypeObjectOrNone(tv.getUpperBound())) {
 				arg += " extends " + tv.getUpperBound().toString();
@@ -85,8 +89,8 @@ public class ClassName {
 	}
 
 	/**
-	 * @return "<String, String>" if the type is "com.app.Type<String, String>"
-	 *         or "" if no generics
+	 * @return "<String, String>" if the type is "com.app.Type<String, String>" or
+	 *         "" if no generics
 	 */
 	public String getGenericPart() {
 		int firstBracket = this.fullClassNameWithGenerics.indexOf("<");
@@ -97,8 +101,8 @@ public class ClassName {
 	}
 
 	/**
-	 * @return "String, String" if the type is "com.app.Type<String, String>" or
-	 *         "" if no generics
+	 * @return "String, String" if the type is "com.app.Type<String, String>" or ""
+	 *         if no generics
 	 */
 	public String getGenericPartWithoutBrackets() {
 		String type = this.getGenericPart();

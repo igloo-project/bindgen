@@ -2,14 +2,14 @@ package org.bindgen.example;
 
 import java.util.HashSet;
 
-import org.junit.Assert;
-import junit.framework.TestCase;
-
 import org.bindgen.ContainerBinding;
+import org.junit.Assert;
+
+import junit.framework.TestCase;
 
 public class CollectionExampleTest extends TestCase {
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public void testGetSet() {
 		CollectionExample e = new CollectionExample();
 		e.things = new HashSet();

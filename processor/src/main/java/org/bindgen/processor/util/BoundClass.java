@@ -81,6 +81,7 @@ public class BoundClass {
 	 * @return "com.app.Type<String, String>" if the type is "com.app.Type<String,
 	 *         String>"
 	 */
+	@Override
 	public String toString() {
 		return this.name.get();
 	}
