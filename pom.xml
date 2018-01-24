@@ -17,7 +17,7 @@
 		<maven.processor.version>3.3.2</maven.processor.version>
 		<maven.deploy.version>2.8.2</maven.deploy.version>
 		
-		<joist.version>1.4.17</joist.version>
+		<joist.version>1.13.3</joist.version>
 		<junit.version>4.11</junit.version>
 	</properties>
 
