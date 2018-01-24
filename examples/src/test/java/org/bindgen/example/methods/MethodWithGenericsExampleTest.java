@@ -3,7 +3,7 @@ package org.bindgen.example.methods;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import junit.framework.TestCase;
 
 public class MethodWithGenericsExampleTest extends TestCase {

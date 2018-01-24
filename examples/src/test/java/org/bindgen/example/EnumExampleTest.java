@@ -1,6 +1,6 @@
 package org.bindgen.example;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import junit.framework.TestCase;
 
 import org.bindgen.example.EnumExample.Foo;

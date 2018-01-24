@@ -1,7 +1,7 @@
 package org.bindgen.example;
 
 import static org.bindgen.BindKeyword.bind;
-import junit.framework.Assert;
+import org.junit.Assert;
 import junit.framework.TestCase;
 
 public class BindKeywordTest extends TestCase {

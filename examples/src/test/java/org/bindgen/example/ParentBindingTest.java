@@ -6,7 +6,7 @@ import org.bindgen.example.parents.FooBinding;
 import org.bindgen.example.parents.FooChildBinding;
 import org.junit.Test;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import junit.framework.TestCase;
 
 public class ParentBindingTest extends TestCase {

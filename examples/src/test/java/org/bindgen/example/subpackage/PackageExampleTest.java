@@ -1,6 +1,6 @@
 package org.bindgen.example.subpackage;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import junit.framework.TestCase;
 
 public class PackageExampleTest extends TestCase {

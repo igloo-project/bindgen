@@ -3,7 +3,7 @@ package org.bindgen.example.fixRawTypes;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import junit.framework.TestCase;
 
 public class RawTypesExampleTest extends TestCase {
