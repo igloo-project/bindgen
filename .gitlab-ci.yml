@@ -20,7 +20,7 @@ maven-deploy:
   stage: deploy
   environment: staging
   script:
-    - "mvn deploy"
+    - "mvn deploy -DskipTests -DperformRelease"
   only:
     - /^master$/
     - /^dev$/
