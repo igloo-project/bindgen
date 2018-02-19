@@ -8,7 +8,8 @@ public class InheritanceTest extends AbstractBindgenTestCase {
 
 	@Test
 	public void testChild() throws Exception {
-		ClassLoader cl = this.compile("org/bindgen/processor/inheritance/Base.java", "org/bindgen/processor/inheritance/Child.java");
+		ClassLoader cl = this.compile("org/bindgen/processor/inheritance/Base.java",
+				"org/bindgen/processor/inheritance/Child.java");
 
 		Class<?> cClass = cl.loadClass("org.bindgen.processor.inheritance.Child");
 		Class<?> cbClass = cl.loadClass("org.bindgen.processor.inheritance.ChildBinding");
@@ -20,7 +21,7 @@ public class InheritanceTest extends AbstractBindgenTestCase {
 		Object valueFieldBinding = cbClass.getMethod("valueField").invoke(childBinding);
 
 		// set via the binding
-		valueBinding.getClass().getMethod("set", String.class).invoke(valueBinding, "FOO");
+		valueBinding.getClass().getMethod("set", Object.class).invoke(valueBinding, "FOO");
 		// get via the class
 		Assert.assertEquals("FOO", cClass.getMethod("value").invoke(child));
 
@@ -30,7 +31,7 @@ public class InheritanceTest extends AbstractBindgenTestCase {
 		Assert.assertEquals("BAR", valueBinding.getClass().getMethod("get").invoke(valueBinding));
 
 		// set via the field binding
-		valueFieldBinding.getClass().getMethod("set", String.class).invoke(valueFieldBinding, "ZAZ");
+		valueFieldBinding.getClass().getMethod("set", Object.class).invoke(valueFieldBinding, "ZAZ");
 		// get via the field binding
 		Assert.assertEquals("ZAZ", valueFieldBinding.getClass().getMethod("get").invoke(valueFieldBinding));
 	}

@@ -8,9 +8,13 @@ import java.util.List;
 
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
 
-/** A utility class for inspecting/transforming class names to the binding version. */
+/**
+ * A utility class for inspecting/transforming class names to the binding
+ * version.
+ */
 public class ClassName {
 
 	private final String fullClassNameWithGenerics;
@@ -27,6 +31,7 @@ public class ClassName {
 		return this.fullClassNameWithGenerics;
 	}
 
+	@Override
 	public String toString() {
 		return this.get();
 	}
@@ -53,19 +58,27 @@ public class ClassName {
 		}
 	}
 
-	/** @return ["T", "U"] if the type is "com.app.Type<T extends Foo, U extends Bar>" */
+	/**
+	 * @return ["T", "U"] if the type is "com.app.Type<T extends Foo, U extends
+	 *         Bar>"
+	 */
 	public List<String> getGenericsWithoutBounds() {
 		List<String> args = new ArrayList<String>();
-		for (TypeVariable tv : (List<TypeVariable>) this.getDeclaredType().getTypeArguments()) {
+		for (TypeMirror tv : this.getDeclaredType().getTypeArguments()) {
 			args.add(tv.toString());
 		}
 		return args;
 	}
 
-	/** @return ["T extends Foo", "U extends Bar" if the type is "com.app.Type<T extends Foo, U extends Bar>" */
+	/**
+	 * @return ["T extends Foo", "U extends Bar" if the type is "com.app.Type<T
+	 *         extends Foo, U extends Bar>"
+	 */
 	public List<String> getGenericsWithBounds() {
 		List<String> args = new ArrayList<String>();
-		for (TypeVariable tv : (List<TypeVariable>) this.getDeclaredType().getTypeArguments()) {
+		@SuppressWarnings("unchecked")
+		List<TypeVariable> typeVariables = (List<TypeVariable>) this.getDeclaredType().getTypeArguments();
+		for (TypeVariable tv : typeVariables) {
 			String arg = tv.toString();
 			if (!Util.isOfTypeObjectOrNone(tv.getUpperBound())) {
 				arg += " extends " + tv.getUpperBound().toString();
@@ -75,7 +88,10 @@ public class ClassName {
 		return args;
 	}
 
-	/** @return "<String, String>" if the type is "com.app.Type<String, String>" or "" if no generics */
+	/**
+	 * @return "<String, String>" if the type is "com.app.Type<String, String>" or
+	 *         "" if no generics
+	 */
 	public String getGenericPart() {
 		int firstBracket = this.fullClassNameWithGenerics.indexOf("<");
 		if (firstBracket != -1) {
@@ -84,7 +100,10 @@ public class ClassName {
 		return "";
 	}
 
-	/** @return "String, String" if the type is "com.app.Type<String, String>" or "" if no generics */
+	/**
+	 * @return "String, String" if the type is "com.app.Type<String, String>" or ""
+	 *         if no generics
+	 */
 	public String getGenericPartWithoutBrackets() {
 		String type = this.getGenericPart();
 		if ("".equals(type)) {
@@ -102,7 +121,7 @@ public class ClassName {
 		return this.fullClassNameWithGenerics;
 	}
 
-	private DeclaredType getDeclaredType() {
+	public DeclaredType getDeclaredType() {
 		TypeElement element = getElementUtils().getTypeElement(this.getWithoutGenericPart());
 		return element == null ? null : (DeclaredType) element.asType();
 	}
@@ -113,7 +132,8 @@ public class ClassName {
 	// that are not on the "last" class. So far this hack seems to work.
 	private String removeRedundantTypeVarsInOuterClasses(String name) {
 		List<Part> generics = new ArrayList<Part>();
-		// this is awful, but see the test case for why we're counting open/close brackets
+		// this is awful, but see the test case for why we're counting
+		// open/close brackets
 		int lastOpen = 0;
 		int openBrackets = 0;
 		for (int i = 0; i < name.length(); i++) {

@@ -1,9 +1,9 @@
 package org.bindgen.example.employee;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
-
 import org.bindgen.Binding;
+import org.junit.Assert;
+
+import junit.framework.TestCase;
 
 public class EmployeeTest extends TestCase {
 
@@ -136,6 +136,7 @@ public class EmployeeTest extends TestCase {
 			return this.binding.getName();
 		}
 
+		@Override
 		public String toString() {
 			return this.binding.get().toString();
 		}

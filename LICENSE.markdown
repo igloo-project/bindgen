@@ -1,5 +1,6 @@
 
 Copyright 2009 Stephen Haberman
+Copyright 2017 Igloo Project https://github.com/igloo-project/igloo-parent
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

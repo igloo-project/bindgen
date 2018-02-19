@@ -1,12 +1,13 @@
 package org.bindgen.example;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
-
 import org.bindgen.example.Parents.Foo;
 import org.bindgen.example.Parents.FooChild;
 import org.bindgen.example.parents.FooBinding;
 import org.bindgen.example.parents.FooChildBinding;
+import org.junit.Test;
+
+import org.junit.Assert;
+import junit.framework.TestCase;
 
 public class ParentBindingTest extends TestCase {
 
@@ -25,6 +26,7 @@ public class ParentBindingTest extends TestCase {
 		Assert.assertSame(b, b.baz().getParentBinding());
 	}
 
+	@Test
 	public void testToString() {
 		FooChildBinding fcb = new FooChildBinding();
 		Assert.assertEquals("FooChildBinding(null)", fcb.toString());

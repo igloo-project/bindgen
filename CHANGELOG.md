@@ -1,3 +1,16 @@
+## 4.0.0 (2018-02-19)
+
+Features:
+
+* JDK >= 8 support
+* Use lambda to implement bindings: allow to drop a lot of inner My*Binding classes; improve compilation time and IDE
+  performance on project with > 100 binding classes
+* there still are old style bindings (inline My*BindingPath) for direct property access or complex generic types
+* code cleanup
+* drop outdated documentation
+* drop ivy, ant support
+* drop automatic formatters
+
 ## 3.0.0 (2016-01-16)
 
 Features:

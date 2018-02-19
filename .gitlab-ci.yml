@@ -1,0 +1,48 @@
+stages:
+  - prepare
+  - build
+  - test
+  - analyze
+  - deploy
+
+maven-prepare:
+  stage: prepare
+  script:
+    - "./ci/config-test.py"
+  artifacts:
+    paths:
+      - gitlab-ci.build.conf
+
+maven-build:
+  stage: build
+  environment: staging
+  script:
+    - "mvn -DskipTests clean compile"
+
+maven-test:
+  stage: test
+  environment: staging
+  script:
+    - "source gitlab-ci.build.conf"
+    - "./ci/maven-allure.sh"
+
+maven-deploy:
+  stage: deploy
+  environment: staging
+  script:
+    - "mvn deploy -DskipTests -DperformRelease"
+  only:
+    - /^master$/
+    - /^dev$/
+    - /^ft-.*-deploy$/
+    - /^rl-.*$/
+    - /^hf-.*$/
+
+sonar-analyze:
+  stage: analyze
+  environment: staging
+  script:
+    - "source gitlab-ci.build.conf"
+    - mvn clean verify sonar:sonar
+      -DskipTests
+      -Dsonar.host.url="https://sonar.tools.kobalt-si.fr"

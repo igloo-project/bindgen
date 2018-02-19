@@ -1,15 +1,15 @@
 package org.bindgen.example;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
-
 import org.bindgen.java.lang.StringBindingPath;
+
+import org.junit.Assert;
+import junit.framework.TestCase;
 
 public class FieldExampleStatelessTest extends TestCase {
 
 	public void testReadWrite() {
 		FieldExampleBinding b = new FieldExampleBinding();
-		StringBindingPath<FieldExample> name = b.name();
+		StringBindingPath<FieldExample, FieldExample> name = b.name();
 
 		FieldExample e1 = new FieldExample("one");
 		FieldExample e2 = new FieldExample("two");

@@ -12,7 +12,8 @@ public class NoArgMethodBindingTest extends AbstractBindgenTestCase {
 		String testedClass = "org.bindgen.processor.noarg.ComplexData";
 		ClassLoader loader = this.compile(filePath(testedClass));
 
-		//Class<?> actualClass = loader.loadClass("org.bindgen.processor.noarg.ComplexData");
+		// Class<?> actualClass =
+		// loader.loadClass("org.bindgen.processor.noarg.ComplexData");
 		Class<?> bindingClass = loader.loadClass(testedClass + "BindingPath");
 
 		assertNotNull(bindingClass);
@@ -40,32 +41,22 @@ public class NoArgMethodBindingTest extends AbstractBindgenTestCase {
 		String testedClass = "org.bindgen.processor.noarg.AccessorAndNoArg";
 		Class<?> bindingClass = this.compile(filePath(testedClass)).loadClass(testedClass + "Binding");
 
-		assertChildBindings(
-			bindingClass,
-			"foo1",
-			"foo2",
-			"foo3",
-			"foo4",
-			"foo5",
-			"foo6",
-			"getFoo1",
-			"getFoo2",
-			"getFoo3",
-			"getFoo4",
-			"hashCodeBinding",
-			"isFoo5",
-			"isFoo6",
-			"toStringBinding");
-		// Note that a a simple reordering of members used to cause inconsistent binding generation, for example:
-		// the class has two accessors: getFoobar/setFoobar for "foobar" and getBarfoo/setBarFoo for "barfoo"
+		assertChildBindings(bindingClass, "foo1", "foo2", "foo3", "foo4", "foo5", "foo6", "getFoo1", "getFoo2",
+				"getFoo3", "getFoo4", "hashCodeBinding", "isFoo5", "isFoo6", "toStringBinding");
+		// Note that a a simple reordering of members used to cause inconsistent binding
+		// generation, for example:
+		// the class has two accessors: getFoobar/setFoobar for "foobar" and
+		// getBarfoo/setBarFoo for "barfoo"
 		// and two unrelated but misleadingly named no-arg methods: "fobar" and "barfoo"
-		// only three bindings used to result and they would be named inconsistenttly. 
+		// only three bindings used to result and they would be named inconsistenttly.
 	}
 
 	@Test
 	public void testPrefixlessAccessors() throws Exception {
-		/* In some places, where java is used as a domain specific language
-		 * you can actually meet accessor methods that do not have any prefixes (e.g. no get/is/has/set)
+		/*
+		 * In some places, where java is used as a domain specific language you can
+		 * actually meet accessor methods that do not have any prefixes (e.g. no
+		 * get/is/has/set)
 		 */
 		String testedClassName = "org.bindgen.processor.noarg.NoPrefixAccessors";
 		ClassLoader loader = this.compile(filePath(testedClassName));
@@ -74,6 +65,7 @@ public class NoArgMethodBindingTest extends AbstractBindgenTestCase {
 
 		assertChildBindings(bindingClass, "foo", "foofoo", "hashCodeBinding", "toStringBinding");
 		Object testObj = testedClass.newInstance();
+		@SuppressWarnings("unchecked")
 		Binding<Object> bindingObj = (Binding<Object>) bindingClass.getConstructor(testedClass).newInstance(testObj);
 		Object fooBinding = bindingClass.getMethod("foo").invoke(bindingObj);
 		Object foofooBinding = bindingClass.getMethod("foofoo").invoke(bindingObj);

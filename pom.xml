@@ -1,18 +1,152 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	
+
 	<modelVersion>4.0.0</modelVersion>
-	
+
 	<artifactId>bindgen-parent</artifactId>
 	<groupId>org.bindgen</groupId>
-	<version>3.2</version>
+	<version>4.0.0</version>
 	<packaging>pom</packaging>
-	
+
 	<name>Bindgen (parent)</name>
+
+	<properties>
+		<bindgen.java.version>1.8</bindgen.java.version>
+		
+		<maven.jgitflow.version>1.0-m5.1</maven.jgitflow.version>
+		<maven.compiler.version>3.6.0</maven.compiler.version>
+		<maven.processor.version>3.3.2</maven.processor.version>
+		<maven.deploy.version>2.8.2</maven.deploy.version>
+		<maven.source.version>3.0.1</maven.source.version>
+		<maven.javadoc.version>3.0.0</maven.javadoc.version>
+		
+		<joist.version>1.13.3</joist.version>
+		<junit.version>4.11</junit.version>
+
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.javadoc.skip>true</maven.javadoc.skip>
+		<maven.javadoc.failOnError>false</maven.javadoc.failOnError>
+
+		<!-- allure related configuration -->
+		<!-- aspectj is used by allure -->
+		<allure-aspectj.version>1.8.13</allure-aspectj.version>
+		<allure-maven.version>2.9</allure-maven.version>
+		<allure.version>2.5.0</allure.version>
+		<allure-junit4.version>2.0-BETA22</allure-junit4.version>
+		<junit-dataprovider.version>1.13.1</junit-dataprovider.version>
+		<maven-surefire-plugin.version>2.20.1</maven-surefire-plugin.version>
+
+		<allure.report>aggregate</allure.report>
+	</properties>
+
+	<profiles>
+		<profile>
+			<id>allure</id>
+			<activation>
+				<property>
+					<name>allure.enabled</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<build>
+				<!-- override junit behavior with allure-junit4 + aspectj -->
+				<!-- configure allure-junit4 output -->
+				<!-- add allure-maven plugin as executor.json file generated during report phase is needed for aggregation -->
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>${maven-surefire-plugin.version}</version>
+						<configuration>
+							<argLine>
+								-javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${allure-aspectj.version}/aspectjweaver-${allure-aspectj.version}.jar"
+							</argLine>
+							<properties>
+								<property>
+									<name>listener</name>
+									<value>io.qameta.allure.junit4.AllureJunit4</value>
+								</property>
+							</properties>
+							<systemProperties>
+								<property>
+									<name>allure.results.directory</name>
+									<value>${project.build.directory}/allure-results</value>
+								</property>
+								<property>
+									<!-- TODO: configure issue URL -->
+									<name>allure.link.issue.pattern</name>
+									<value>https://example.org/issue/{}</value>
+								</property>
+							</systemProperties>
+						</configuration>
+						<dependencies>
+							<dependency>
+								<groupId>org.aspectj</groupId>
+								<artifactId>aspectjweaver</artifactId>
+								<version>${allure-aspectj.version}</version>
+							</dependency>
+						</dependencies>
+					</plugin>
+					<plugin>
+						<groupId>io.qameta.allure</groupId>
+						<artifactId>allure-maven</artifactId>
+					</plugin>
+				</plugins>
+			</build>
+			<reporting>
+				<excludeDefaults>true</excludeDefaults>
+				<plugins>
+					<plugin>
+						<groupId>io.qameta.allure</groupId>
+						<artifactId>allure-maven</artifactId>
+						<version>${allure-maven.version}</version>
+						<reportSets>
+							<reportSet>
+								<reports>
+									<report>${allure.report}</report>
+								</reports>
+							</reportSet>
+						</reportSets>
+					</plugin>
+				</plugins>
+			</reporting>
+		</profile>
+	</profiles>
 
 	<modules>
 		<module>processor</module>
 		<module>examples</module>
 	</modules>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>joist</groupId>
+				<artifactId>joist-util</artifactId>
+				<version>${joist.version}</version>
+			</dependency>
+		
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<scope>test</scope>
+				<version>${junit.version}</version>
+			</dependency>
+
+			<!-- Allure related configuration -->
+			<dependency>
+				<groupId>io.qameta.allure</groupId>
+				<artifactId>allure-junit4</artifactId>
+				<version>${allure-junit4.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.tngtech.java</groupId>
+				<artifactId>junit-dataprovider</artifactId>
+				<version>${junit-dataprovider.version}</version>
+				<scope>test</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<build>
 		<pluginManagement>
@@ -20,7 +154,7 @@
 				<plugin>
 					<groupId>external.atlassian.jgitflow</groupId>
 					<artifactId>jgitflow-maven-plugin</artifactId>
-					<version>1.0-m5.1</version>
+					<version>${maven.jgitflow.version}</version>
 					<configuration>
 						<autoVersionSubmodules>true</autoVersionSubmodules>
 						<flowInitContext>
@@ -35,12 +169,61 @@
 				</plugin>
 				<plugin>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.6.0</version>
+					<version>${maven.compiler.version}</version>
 					<configuration>
-						<source>1.7</source>
-						<target>1.7</target>
+						<source>${bindgen.java.version}</source>
+						<target>${bindgen.java.version}</target>
 						<compilerArgument>-proc:none</compilerArgument>
 						<testCompilerArgument>-proc:none</testCompilerArgument>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.bsc.maven</groupId>
+					<artifactId>maven-processor-plugin</artifactId>
+					<version>${maven.processor.version}</version>
+					<configuration>
+						<processors>
+							<processor>org.bindgen.processor.Processor</processor>
+						</processors>
+					</configuration>
+					<executions>
+						<execution>
+							<id>maven-processor-plugin-default</id>
+							<phase>generate-sources</phase>
+							<goals>
+								<goal>process</goal>
+							</goals>
+						</execution>
+					</executions>
+					<dependencies>
+						<dependency>
+							<groupId>org.bindgen</groupId>
+							<artifactId>bindgen</artifactId>
+							<version>${project.version}</version>
+						</dependency>
+					</dependencies>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-deploy-plugin</artifactId>
+					<version>${maven.deploy.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<version>${maven.source.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<version>${maven.javadoc.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>io.qameta.allure</groupId>
+					<artifactId>allure-maven</artifactId>
+					<version>${allure-maven.version}</version>
+					<configuration>
+						<reportVersion>${allure.version}</reportVersion>
 					</configuration>
 				</plugin>
 			</plugins>
@@ -54,34 +237,34 @@
 		</repository>
 	</repositories>
 
+	<distributionManagement>
+		<repository>
+			<id>nexus-igloo-releases</id>
+			<name>Nexus Igloo Releases</name>
+			<url>https://nexus.tools.kobalt-si.fr/repository/igloo-releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>nexus-igloo-snapshots</id>
+			<name>Nexus Igloo Snapshots</name>
+			<url>https://nexus.tools.kobalt-si.fr/repository/igloo-snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
+
+	<issueManagement>
+		<system>GitHub</system>
+		<url>https://github.com/igloo-project/igloo-parent/issues</url>
+	</issueManagement>
+
+	<ciManagement>
+		<system>GitLab</system>
+		<url>https://gitlab.tools.kobalt-si.fr/igloo/igloo-parent/pipelines</url>
+	</ciManagement>
+
 	<scm>
 		<url>git@github.com:igloo-project/bindgen.git</url>
 		<connection>scm:git:git@github.com:igloo-project/bindgen.git</connection>
 		<developerConnection>scm:git:git@github.com:igloo-project/bindgen.git</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
-
-	<profiles>
-		<profile>
-			<activation>
-				<property>
-					<name>distribution</name>
-					<value>kobalt-release</value>
-				</property>
-			</activation>
-			<distributionManagement>
-				<repository>
-					<id>nexus-kobalt-releases</id>
-					<name>Nexus Kobalt Releases</name>
-					<url>https://nexus.tools.kobalt-si.fr/repository/kobalt-releases</url>
-				</repository>
-				<snapshotRepository>
-					<id>nexus-kobalt-snapshots</id>
-					<name>Nexus Kobalt Snapshots</name>
-					<url>https://nexus.tools.kobalt-si.fr/repository/kobalt-snapshots</url>
-				</snapshotRepository>
-			</distributionManagement>
-		</profile>
-	</profiles>
 
 </project>

@@ -1,10 +1,10 @@
 package org.bindgen.example.methods;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
-
 import org.bindgen.Binding;
 import org.bindgen.ContainerBinding;
+import org.junit.Assert;
+
+import junit.framework.TestCase;
 
 public class MethodExampleTest extends TestCase {
 
@@ -89,7 +89,9 @@ public class MethodExampleTest extends TestCase {
 	@SuppressWarnings("unchecked")
 	public void testWildcards() {
 		MethodExample e = new MethodExample("1", "name");
-		e.setWildcards(new Wildcards());
+		@SuppressWarnings("rawtypes")
+		Wildcards rawWildcards = new Wildcards();
+		e.setWildcards(rawWildcards);
 		MethodExampleBinding b = new MethodExampleBinding(e);
 		b.wildcards().a().set("a string");
 		// needs casting b.wildcards().b().set("anything");
@@ -125,8 +127,8 @@ public class MethodExampleTest extends TestCase {
 		String[] arrayProp2 = { "foobar" };
 
 		e.setArrayProp(arrayProp);
-		Assert.assertEquals(arrayProp, b.arrayProp().get());
+		Assert.assertArrayEquals(arrayProp, b.arrayProp().get());
 		b.arrayProp().set(arrayProp2);
-		Assert.assertEquals(arrayProp2, b.arrayProp().get());
+		Assert.assertArrayEquals(arrayProp2, b.arrayProp().get());
 	}
 }

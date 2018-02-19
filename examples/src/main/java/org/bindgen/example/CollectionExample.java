@@ -7,6 +7,6 @@ import org.bindgen.Bindable;
 @Bindable
 public class CollectionExample {
 	// Was causing an error in getContainedType because of not having generics
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Set things;
 }

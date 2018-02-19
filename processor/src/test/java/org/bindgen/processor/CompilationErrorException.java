@@ -6,9 +6,9 @@ import javax.tools.JavaFileObject;
 
 /**
  * Exception throw when compilation fails during a test case execution.
- * 
+ *
  * @author igor.vaynberg
-  */
+ */
 public class CompilationErrorException extends Exception {
 	private static final long serialVersionUID = 1L;
 
@@ -16,8 +16,9 @@ public class CompilationErrorException extends Exception {
 
 	/**
 	 * Constructor
-	 * 
-	 * @param diagnosticCollector collector that contains compilation errors
+	 *
+	 * @param diagnosticCollector
+	 *            collector that contains compilation errors
 	 */
 	public CompilationErrorException(DiagnosticCollector<JavaFileObject> diagnosticCollector) {
 		super(message(diagnosticCollector));
@@ -31,12 +32,13 @@ public class CompilationErrorException extends Exception {
 		return this.diagnosticCollector;
 	}
 
+	@SuppressWarnings("incomplete-switch")
 	private static String message(DiagnosticCollector<JavaFileObject> dc) {
 		StringBuilder message = new StringBuilder();
 		for (Diagnostic<?> d : dc.getDiagnostics()) {
 			switch (d.getKind()) {
-				case ERROR:
-					message.append("ERROR: " + d.toString() + "\n");
+			case ERROR:
+				message.append("ERROR: " + d.toString() + "\n");
 			}
 		}
 		return message.toString();

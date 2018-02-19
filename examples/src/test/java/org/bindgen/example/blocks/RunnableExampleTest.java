@@ -1,6 +1,6 @@
 package org.bindgen.example.blocks;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import junit.framework.TestCase;
 
 import org.bindgen.NamedBinding;
