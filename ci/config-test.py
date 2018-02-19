@@ -45,9 +45,12 @@ conf = """
 
 export MAVEN_OPTS={maven_opts}
 
+mkdir -p {temp_dir}
+
 """.format(
   date=datetime.now().isoformat(),
-  maven_opts=quote(' '.join([i for i in maven_opts]))
+  maven_opts=quote(' '.join([i for i in maven_opts])),
+  temp_dir=quote(temp_dir)
 ).strip()
 
 # write and display config
