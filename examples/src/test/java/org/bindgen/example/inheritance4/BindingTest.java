@@ -1,6 +1,6 @@
 package org.bindgen.example.inheritance4;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import junit.framework.TestCase;
 
 public class BindingTest extends TestCase {

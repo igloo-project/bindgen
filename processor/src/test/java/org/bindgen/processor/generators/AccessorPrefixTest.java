@@ -1,6 +1,6 @@
 package org.bindgen.processor.generators;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Test;
 

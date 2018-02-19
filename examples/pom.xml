@@ -5,12 +5,16 @@
 	<parent>
 		<groupId>org.bindgen</groupId>
 		<artifactId>bindgen-parent</artifactId>
-		<version>3.3-SNAPSHOT</version>
+		<version>4.0.0-SNAPSHOT</version>
 	</parent>
 	
 	<artifactId>bindgen-examples</artifactId>
 	
 	<name>Bindgen (examples)</name>
+
+	<properties>
+		<allure.report>report</allure.report>
+	</properties>
 
 	<dependencies>
 		<dependency>
@@ -24,53 +28,32 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<scope>test</scope>
-			<version>4.11</version>
+		</dependency>
+
+		<!-- Allure related -->
+		<dependency>
+			<groupId>io.qameta.allure</groupId>
+			<artifactId>allure-junit4</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.tngtech.java</groupId>
+			<artifactId>junit-dataprovider</artifactId>
 		</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+			</plugin>
+			<plugin>
 				<groupId>org.bsc.maven</groupId>
 				<artifactId>maven-processor-plugin</artifactId>
-				<version>3.2.0</version>
-				<executions>
-					<execution>
-						<id>maven-processor-plugin-default</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>process</goal>
-							<goal>process-test</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>target/generated-sources/apt</outputDirectory>
-							<options>
-								<fullyAnnotationConfigured>true</fullyAnnotationConfigured>
-								<addSuppressWarningsAnnotation>true</addSuppressWarningsAnnotation>
-							</options>
-							<processors>
-								<processor>org.bindgen.processor.Processor</processor>
-							</processors>
-						</configuration>
-					</execution>
-				</executions>
-				<dependencies>
-					<dependency>
-						<groupId>org.bindgen</groupId>
-						<artifactId>bindgen</artifactId>
-						<version>${project.version}</version>
-						<scope>compile</scope>
-					</dependency>
-				</dependencies>
 			</plugin>
 			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.6.0</version>
-			</plugin>
-			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-deploy-plugin</artifactId>
-				<version>2.8.2</version>
 				<configuration>
 					<skip>true</skip>
 				</configuration>

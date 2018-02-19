@@ -3,7 +3,7 @@ package org.bindgen.example.access;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import junit.framework.TestCase;
 
 public class AccessTest extends TestCase {

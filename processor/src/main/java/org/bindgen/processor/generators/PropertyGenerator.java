@@ -6,6 +6,8 @@ import java.util.List;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 
+import org.bindgen.processor.util.BoundClass;
+
 import joist.sourcegen.GClass;
 
 /** Common methods for property (e.g. method/field/callable) generators. */
@@ -14,16 +16,23 @@ public interface PropertyGenerator {
 	/** @return the property name, e.g. the method/field name */
 	String getPropertyName();
 
-	/** @return the type elements for this signature, to potentially recursively make bindings for */
+	/**
+	 * @return the type elements for this signature, to potentially recursively
+	 *         make bindings for
+	 */
 	List<TypeElement> getPropertyTypeElements();
 
-	/** @return whether this binding has any sub-bindings that need to be registered */
+	/**
+	 * @return whether this binding has any sub-bindings that need to be
+	 *         registered
+	 */
 	boolean hasSubBindings();
 
 	/** Generates the property binding. */
 	void generate();
 
 	public static interface GeneratorFactory {
-		PropertyGenerator newGenerator(GClass outerClass, TypeElement outerElement, Element element, Collection<String> namesTaken) throws WrongGeneratorException;
+		PropertyGenerator newGenerator(GClass outerClass, BoundClass boundClass, TypeElement outerElement,
+				Element element, Collection<String> namesTaken) throws WrongGeneratorException;
 	}
 }

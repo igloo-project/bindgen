@@ -98,22 +98,9 @@ For more examples, see [MethodExampleStatelessTest][4].
 
 [4]: /stephenh/bindgen/blob/master/examples/src/test/java/org/bindgen/example/methods/MethodExampleStatelessTest.java
 
-Gotchas
-=======
-
-* Eclipse: 3.5 works best--3.4 has several bugs that were fixed (see [263985][3])
-* Eclipse: Annotating packages does not work
-* Eclipse: Must be run *on* a JDK6 JVM--for Macs, this means 3.5 64-bit on the Apple 64-bit JDK6
-* IntelliJ: Has mediocre support for annotation processors (last I checked)
-* `javac`: Does not properly re-use already-generated classes, so pass `-AskipExistingBindingCheck=true` to re-generate all of the binding classes each time
-
-[3]: https://bugs.eclipse.org/bugs/show_bug.cgi?id=263985
-
 Todo
 ====
 
-* Support extension methods, e.g. StringBinding could have extra methods like `length()`, `substring()`, etc., ideally configurable - done.
-* Optional null-safe get/set, e.g. `eb.employer().name()` with a null `employer` could have `get()` return `null` and not NPE and `set()` could create a `new Employer()` to then call `setName()` on to again avoid the NPE
 * Document options, `fixRawTypes`, `bindgen.log`, etc.
 * Package a `bindgen-profiled` that has post-processed/something basic wall clock timing for performance analysis
 * Make `Util.resolveTypeVarIfPossible` go away in favor of `Types.memberOf` (if possible)
@@ -122,5 +109,3 @@ Todo
   * Perhaps this would be solved by having child bindings inherit from the parent, e.g. `ChildBindingPath extends ParentBindingPath<String>`
 * Move most `Binding` methods behind a `asBound` method so that generated bindings don't have a polluted name space
 * Add `Binding.getTag/setTag` for attaching metadata to binding instances (like gwt-mpv properties)
-
-
