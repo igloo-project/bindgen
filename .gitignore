@@ -3,7 +3,7 @@ examples-workspace
 target
 **/.classpath
 **/.project
-**/.setting
-docs/.builddir
-docs/build
+**/.settings
+gitlab-ci.build.conf
 
+.*.swp
