@@ -14,7 +14,7 @@
 		
 		<maven.jgitflow.version>1.0-m5.1</maven.jgitflow.version>
 		<maven.compiler.version>3.6.0</maven.compiler.version>
-		<maven.processor.version>3.3.2</maven.processor.version>
+		<maven.processor.version>3.3.3</maven.processor.version>
 		<maven.deploy.version>2.8.2</maven.deploy.version>
 		<maven.source.version>3.0.1</maven.source.version>
 		<maven.javadoc.version>3.0.0</maven.javadoc.version>
