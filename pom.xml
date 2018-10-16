@@ -20,7 +20,7 @@
 		<maven.javadoc.version>3.0.0</maven.javadoc.version>
 		
 		<joist.version>1.13.3</joist.version>
-		<junit.version>4.11</junit.version>
+		<junit.version>4.12</junit.version>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.javadoc.skip>true</maven.javadoc.skip>
@@ -31,7 +31,7 @@
 		<allure-aspectj.version>1.8.13</allure-aspectj.version>
 		<allure-maven.version>2.9</allure-maven.version>
 		<allure.version>2.5.0</allure.version>
-		<allure-junit4.version>2.0-BETA22</allure-junit4.version>
+		<allure-junit4.version>2.7.0</allure-junit4.version>
 		<junit-dataprovider.version>1.13.1</junit-dataprovider.version>
 		<maven-surefire-plugin.version>2.20.1</maven-surefire-plugin.version>
 
