@@ -45,4 +45,4 @@ sonar-analyze:
     - "source gitlab-ci.build.conf"
     - mvn clean verify sonar:sonar
       -DskipTests
-      -Dsonar.host.url="https://sonar.tools.kobalt-si.fr"
+      -Dsonar.host.url="https://sonar.tools.kobalt.fr"
