@@ -59,7 +59,7 @@ public class BoundProperty {
 		// if we're an array, keep the primitive type, e.g. char[]
 		this.type = this.isArray ? type : Util.boxIfNeeded(type);
 		this.element = getTypeUtils().asElement(Util.boxIfNeeded(type));
-		this.name = new ClassName(this.type.toString());
+		this.name = new ClassName(Util.getTypeName(this.type));
 		this.isFixingRawType = this.fixRawTypeIfNeeded();
 	}
 
