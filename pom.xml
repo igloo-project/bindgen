@@ -34,6 +34,7 @@
 		<allure-junit4.version>2.0-BETA22</allure-junit4.version>
 		<junit-dataprovider.version>1.13.1</junit-dataprovider.version>
 		<maven-surefire-plugin.version>2.20.1</maven-surefire-plugin.version>
+		<jsch.version>0.1.54</jsch.version>
 
 		<allure.report>aggregate</allure.report>
 	</properties>
@@ -166,6 +167,13 @@
 							<versionTagPrefix>v</versionTagPrefix>
 						</flowInitContext>
 					</configuration>
+					<dependencies>
+						<dependency>
+							<groupId>com.jcraft</groupId>
+							<artifactId>jsch</artifactId>
+							<version>${jsch.version}</version>
+						</dependency>
+					</dependencies>
 				</plugin>
 				<plugin>
 					<artifactId>maven-compiler-plugin</artifactId>
