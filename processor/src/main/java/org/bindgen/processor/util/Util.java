@@ -16,6 +16,7 @@ import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.SimpleTypeVisitor6;
 import javax.lang.model.util.Types;
 
 import joist.sourcegen.Access;
@@ -104,6 +105,24 @@ public class Util {
 		} else {
 			return Access.PACKAGE;
 		}
+	}
+
+	/**
+	 * Returns the type name associated to the given {@link TypeMirror} as
+	 * <code>type.toString</code> seems to be unreliable in some cases.
+	 *
+	 * @param type
+	 * @return
+	 */
+	public static String getTypeName(TypeMirror type) {
+		return type.accept(new SimpleTypeVisitor6<String, Void>(type.toString()) {
+
+			@Override
+			public String visitDeclared(DeclaredType t, Void p) {
+				return t.toString();
+			}
+
+		}, null);
 	}
 
 	/**

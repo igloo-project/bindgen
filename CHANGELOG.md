@@ -1,3 +1,9 @@
+## 4.0.1 (2018-11-17)
+
+### Bugfix
+
+* #8: fix to support type annotations (thanks to @nfekete)
+
 ## 4.0.0 (2018-02-19)
 
 Features:
