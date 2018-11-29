@@ -1,4 +1,4 @@
-package org.bindgen.example;
+package org.bindgen.processor.typearguments;
 
 import org.bindgen.Bindable;
 
