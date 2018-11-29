@@ -215,14 +215,16 @@ public class MethodPropertyGenerator extends AbstractGenerator implements Proper
 
 	private void addInnerClassGetWithRoot() {
 		GMethod getWithRoot = this.innerClass.getMethod("getWithRoot");
-		getWithRoot.argument("R", "root").returnType(this.property.getSetType()).addAnnotation("@Override");
+		getWithRoot.argument(boundClass.getRootTypeArgument(), "root")
+			.returnType(this.property.getSetType()).addAnnotation("@Override");
 		getWithRoot.body.line("return {}{}.this.getWithRoot(root).{}();", //
 				this.property.getCastForReturnIfNeeded(), this.outerClass.getSimpleName(), this.methodName);
 	}
 
 	private void addInnerClassGetSafelyWithRoot() {
 		GMethod m = this.innerClass.getMethod("getSafelyWithRoot");
-		m.argument("R", "root").returnType(this.property.getSetType()).addAnnotation("@Override");
+		m.argument(boundClass.getRootTypeArgument(), "root")
+			.returnType(this.property.getSetType()).addAnnotation("@Override");
 		m.body.line("if ({}.this.getSafelyWithRoot(root) == null) {", this.outerClass.getSimpleName());
 		m.body.line("    return null;");
 		m.body.line("} else {");
@@ -239,8 +241,11 @@ public class MethodPropertyGenerator extends AbstractGenerator implements Proper
 	}
 
 	private void addReadOnlyInnerClassSetWithRoot() {
-		GMethod setWithRoot = this.innerClass.getMethod("setWithRoot(R root, {} {})", this.property.getSetType(),
-				this.property.getName());
+		GMethod setWithRoot = this.innerClass.getMethod("setWithRoot({} root, {} {})",
+			boundClass.getRootTypeArgument(),
+			this.property.getSetType(),
+			this.property.getName()
+		);
 		setWithRoot.addAnnotation("@Override");
 		setWithRoot.body.line("throw new RuntimeException(this.getName() + \" is read only\");");
 	}
@@ -257,8 +262,11 @@ public class MethodPropertyGenerator extends AbstractGenerator implements Proper
 	}
 
 	private void addInnerClassSetWithRoot() {
-		GMethod setWithRoot = this.innerClass.getMethod("setWithRoot(R root, {} {})", this.property.getSetType(),
-				this.property.getName());
+		GMethod setWithRoot = this.innerClass.getMethod("setWithRoot({} root, {} {})",
+			boundClass.getRootTypeArgument(),
+			this.property.getSetType(),
+			this.property.getName()
+		);
 		setWithRoot.addAnnotation("@Override");
 		setWithRoot.body.line("{}.this.getWithRoot(root).{}({});", //
 				this.outerClass.getSimpleName(), this.prefix.setterName(this.methodName), this.property.getName());
