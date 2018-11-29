@@ -192,14 +192,22 @@ public class BoundProperty {
 	private String getInnerClassSuperClass(boolean replaceWildcards) {
 		// Arrays don't have individual binding classes
 		if (this.isArray()) {
-			return getConfig().bindingPathSuperClassName() + "<R, " + this.boundClass.get() + ", "
-					+ this.type.toString() + ">";
+			return String.format("%s<%s, %s, %s>",
+				getConfig().bindingPathSuperClassName(),
+				this.boundClass.getRootTypeArgument(),
+				this.boundClass.get(),
+				this.type.toString()
+			);
 		}
 		// Being a generic type, we have no XxxBindingPath to extend, so just
 		// extend AbstractBinding directly
 		if (this.isForGenericTypeParameter()) {
-			return getConfig().bindingPathSuperClassName() + "<R, " + this.boundClass.get() + ", "
-					+ this.getGenericElement() + ">";
+			return String.format("%s<%s, %s, %s>",
+				getConfig().bindingPathSuperClassName(),
+				this.boundClass.getRootTypeArgument(),
+				this.boundClass.get(),
+				this.getGenericElement()
+			);
 		}
 
 		// if our type is outside the binding scope and no existing binding is
@@ -219,13 +227,17 @@ public class BoundProperty {
 																							// use
 																							// it
 		) {
-			return GenericObjectBindingPath.class.getName() + "<R, " + this.boundClass.get() + ", "
-					+ this.type.toString() + ">";
+			return String.format("%s<%s, %s, %s>",
+				GenericObjectBindingPath.class.getName(),
+				this.boundClass.getRootTypeArgument(),
+				this.boundClass.get(),
+				this.type.toString()
+			);
 		}
 
 		String superName = Util.lowerCaseOuterClassNames(this.element,
 				getConfig().baseNameForBinding(this.name) + "BindingPath");
-		List<String> typeArgs = Copy.list("R", this.boundClass.get());
+		List<String> typeArgs = Copy.list(this.boundClass.getRootTypeArgument(), this.boundClass.get());
 		if (this.isRawType()) {
 			for (TypeParameterElement tpe : this.getElement().getTypeParameters()) {
 				typeArgs.add(replaceWildcards ? "?" : tpe.toString());
@@ -272,6 +284,10 @@ public class BoundProperty {
 			}
 		}
 		return this.get();
+	}
+
+	public BoundClass getBoundClass() {
+		return boundClass;
 	}
 
 	public String getName() {
