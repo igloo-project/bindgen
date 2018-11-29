@@ -58,10 +58,6 @@ public class BoundClass {
 			}
 			return result;
 		}
-//		element.getTypeParameters()
-//			.stream()
-//			.flatMap(typeParameterElement -> typeParameterElement.asType().
-//				.stream())
 	}
 
 	public boolean hasGenerics() {
