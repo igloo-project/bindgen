@@ -162,7 +162,7 @@ public class BoundProperty {
 					if (wildcard.extendsBound != null) {
 						// the user declared their own bounds, e.g. "public
 						// Foo<? extends Foo<?>> foo"
-						suffix += " extends " + wildcard.extendsBound.toString();
+						suffix += " extends " + Util.getTypeName(wildcard.extendsBound);
 					} else if (wildcard.wildcardParameter != null) {
 						suffix += " extends " + toStringWithDummyParam(wildcard.wildcardParameter.getBounds().get(0),
 								wildcard.wildcardParameter.asType(), wildcard.dummyParam, dummyTypes);
@@ -196,7 +196,7 @@ public class BoundProperty {
 				getConfig().bindingPathSuperClassName(),
 				this.boundClass.getRootTypeArgument(),
 				this.boundClass.get(),
-				this.type.toString()
+				this.name
 			);
 		}
 		// Being a generic type, we have no XxxBindingPath to extend, so just
@@ -213,25 +213,14 @@ public class BoundProperty {
 		// if our type is outside the binding scope and no existing binding is
 		// available,
 		// we return a generic binding type
-		if (!this.shouldGenerateBindingClassForType() && !this.existsFieldTypeBindingFor() // check
-																							// if
-																							// type
-																							// binding
-																							// already
-																							// exists
-																							// ;
-																							// if
-																							// so,
-																							// we
-																							// can
-																							// use
-																							// it
-		) {
+
+		// check if type binding already exists;if so, we can use it
+		if (!this.shouldGenerateBindingClassForType() && !this.existsFieldTypeBindingFor()) {
 			return String.format("%s<%s, %s, %s>",
 				GenericObjectBindingPath.class.getName(),
 				this.boundClass.getRootTypeArgument(),
 				this.boundClass.get(),
-				this.type.toString()
+				this.name
 			);
 		}
 
@@ -250,7 +239,7 @@ public class BoundProperty {
 				if (tm.getKind() == TypeKind.WILDCARD) {
 					typeArgs.add(replaceWildcards ? "?" : ("U" + wildcardIndex++));
 				} else {
-					typeArgs.add(tm.toString());
+					typeArgs.add(Util.getTypeName(tm));
 				}
 			}
 		}
@@ -268,7 +257,7 @@ public class BoundProperty {
 					if (tm.getKind() == TypeKind.WILDCARD) {
 						dummyParams.add("U" + (wildcardIndex++));
 					} else {
-						dummyParams.add(tm.toString());
+						dummyParams.add(Util.getTypeName(tm));
 					}
 				}
 			}
@@ -375,7 +364,7 @@ public class BoundProperty {
 	private boolean fixRawTypeIfNeeded() {
 		String fixedTypeParameter = getConfig().fixedRawType(this.enclosing, this.propertyName);
 		if (!this.hasGenerics() && fixedTypeParameter != null) {
-			this.name = new ClassName(this.type.toString() + "<" + fixedTypeParameter + ">");
+			this.name = new ClassName(this.name + "<" + fixedTypeParameter + ">");
 			return true;
 		}
 		return false;
@@ -443,7 +432,7 @@ public class BoundProperty {
 				params.add(toStringWithDummyParam(ta, tp, dummyParameter, dummyTypes));
 			}
 			if (params.size() == 0) {
-				return tm.toString();
+				return Util.getTypeName(tm);
 			} else {
 				return dt.asElement().toString() + "<" + Join.commaSpace(params) + ">";
 			}
@@ -452,7 +441,7 @@ public class BoundProperty {
 			return dummyParameter;
 		}
 		String existingDummy = dummyTypes.get(tm);
-		return existingDummy == null ? tm.toString() : existingDummy;
+		return existingDummy == null ? Util.getTypeName(tm) : existingDummy;
 	}
 
 	private static class WildcardTypeData {

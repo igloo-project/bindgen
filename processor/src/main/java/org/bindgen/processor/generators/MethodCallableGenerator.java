@@ -112,7 +112,7 @@ public class MethodCallableGenerator extends AbstractGenerator implements Proper
 
 	private void addInnerClassMethod() {
 		GMethod run = this.innerClass.getMethod(this.blockMethod.getSimpleName().toString());
-		run.returnType(this.blockMethod.getReturnType().toString());
+		run.returnType(Util.getTypeName(this.blockMethod.getReturnType()));
 		run.body.line("{}{}.this.get().{}({});", //
 				this.getReturnPrefixIfNeeded(), this.outerClass.getSimpleName(), this.methodName, this.getArguments());
 		this.addMethodParameters(run);
@@ -174,13 +174,13 @@ public class MethodCallableGenerator extends AbstractGenerator implements Proper
 
 	private void addMethodParameters(GMethod run) {
 		for (VariableElement foo : this.blockMethod.getParameters()) {
-			run.argument(foo.asType().toString(), foo.getSimpleName().toString());
+			run.argument(Util.getTypeName(foo.asType()), foo.getSimpleName().toString());
 		}
 	}
 
 	private void addMethodThrows(GMethod run) {
 		for (TypeMirror type : this.method.getThrownTypes()) {
-			run.addThrows(type.toString());
+			run.addThrows(Util.getTypeName(type));
 		}
 	}
 

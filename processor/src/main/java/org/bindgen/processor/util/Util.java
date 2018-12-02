@@ -58,7 +58,7 @@ public class Util {
 	}
 
 	public static boolean isOfTypeObjectOrNone(TypeMirror type) {
-		return type.getKind() == TypeKind.NONE || type.toString().equals("java.lang.Object");
+		return type.getKind() == TypeKind.NONE || Util.getTypeName(type).equals("java.lang.Object");
 	}
 
 	/**
