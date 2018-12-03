@@ -1,16 +1,14 @@
 package org.bindgen.processor.util;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Properties;
-
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.tools.FileObject;
-import javax.tools.StandardLocation;
 import javax.tools.JavaFileManager.Location;
+import javax.tools.StandardLocation;
+import java.io.*;
+import java.net.URL;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class ConfUtil {
 
@@ -19,18 +17,18 @@ public class ConfUtil {
 		Map<String, String> properties = new LinkedHashMap<String, String>();
 
 		// Eclipse, ant, and maven all act a little differently here, so try both source and class output
-		File file = null;
+		InputStream inputStream = null;
 		for (Location location : new Location[] { StandardLocation.SOURCE_OUTPUT, StandardLocation.CLASS_OUTPUT }) {
-			file = resolveBindgenPropertiesIfExists(location, env, fileName);
-			if (file != null) {
+			inputStream = resolveBindgenPropertiesIfExists(location, env, fileName);
+			if (inputStream != null) {
 				break;
 			}
 		}
 
-		if (file != null) {
+		if (inputStream != null) {
 			Properties p = new Properties();
-			try {
-				p.load(new FileInputStream(file));
+			try (InputStream is = inputStream) {
+				p.load(is);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -58,35 +56,58 @@ public class ConfUtil {
 	 * So we start there and walk up parent directories looking for
 	 * {@code bindgen.properties} files.
 	 */
-	private static File resolveBindgenPropertiesIfExists(Location location, ProcessingEnvironment env, String fileName) {
-		// Find a dummy /bin/apt/dummy.txt path to start at
-		final String dummyPath;
-		try {
-			// We don't actually create this, we just want its URI
-			FileObject dummyFileObject = env.getFiler().getResource(location, "", "dummy.txt");
-			dummyPath = dummyFileObject.toUri().toString().replaceAll("file:", "");
-		} catch (IOException e1) {
-			return null;
-		}
+	private static InputStream resolveBindgenPropertiesIfExists(Location location, ProcessingEnvironment env, String fileName) {
+	    final String propertiesFilename = "bindgen.properties";
+        final FileObject fileObject;
+        final URL baseUrl;
+        try {
+            fileObject = env.getFiler().getResource(location, "", propertiesFilename);
+            baseUrl = fileObject.toUri()
+                .toURL();
+        } catch (IOException e1) {
+            return null;
+        }
 
-		// Walk up looking for a bindgen.properties
-		File current = new File(dummyPath).getParentFile();
-		while (current != null) {
-			File possible = new File(current, fileName);
-			if (possible.exists()) {
-				return possible;
-			}
-			current = current.getParentFile();
+		String path = baseUrl.getPath();
+        if (path.startsWith("/")) {
+        	path = path.substring(1);
 		}
+		final List<String> componentsWithFile = Arrays.asList(path
+            .split("/"));
+		final List<String> dirPathComponents = componentsWithFile.subList(0, componentsWithFile.size() - 1);
+		final Optional<InputStream> bindingPropertiesInAncestorPaths = IntStream.iterate(dirPathComponents.size(), i -> i - 1)
+            .limit(dirPathComponents.size() - 1)
+            .boxed()
+            .map(i -> dirPathComponents.subList(0, i))
+            .map(list -> list.stream()
+                .collect(Collectors.joining("/", "/", "/" + propertiesFilename)))
+            .<Optional<InputStream>> map(newPath -> {
+                try {
+                    URL url = new URL(baseUrl, newPath);
+                    InputStream inputStream = url.openStream();
+                    return Optional.of(inputStream);
+                } catch (IOException e) {
+                    return Optional.empty();
+                }
+            })
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .findFirst();
 
-		// Before giving up, try just grabbing it from the current directory
-		File possible = new File(fileName);
-		if (possible.exists()) {
-			return possible;
-		}
+        return bindingPropertiesInAncestorPaths.orElseGet(() -> {
+            // Before giving up, try just grabbing it from the current directory
+            File possible = new File(fileName);
+            if (possible.exists()) {
+                try {
+                    return new FileInputStream(possible);
+                } catch (FileNotFoundException e) {
+                    return null;
+                }
+            }
+            // No file found
+            return null;
+        });
 
-		// No file found
-		return null;
-	}
+    }
 
 }
