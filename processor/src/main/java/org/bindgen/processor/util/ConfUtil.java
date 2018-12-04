@@ -9,6 +9,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class ConfUtil {
 
@@ -57,57 +58,59 @@ public class ConfUtil {
 	 * {@code bindgen.properties} files.
 	 */
 	private static InputStream resolveBindgenPropertiesIfExists(Location location, ProcessingEnvironment env, String fileName) {
-	    final String propertiesFilename = "bindgen.properties";
-        final FileObject fileObject;
-        final URL baseUrl;
-        try {
-            fileObject = env.getFiler().getResource(location, "", propertiesFilename);
-            baseUrl = fileObject.toUri()
-                .toURL();
-        } catch (IOException e1) {
-            return null;
-        }
-
-		String path = baseUrl.getPath();
-        if (path.startsWith("/")) {
-        	path = path.substring(1);
+		final FileObject fileObject;
+		final URL baseUrl;
+		try {
+			fileObject = env.getFiler().getResource(location, "", fileName);
+			baseUrl = fileObject.toUri()
+				.toURL();
+		} catch (IOException e1) {
+			return null;
 		}
-		final List<String> componentsWithFile = Arrays.asList(path
-            .split("/"));
-		final List<String> dirPathComponents = componentsWithFile.subList(0, componentsWithFile.size() - 1);
-		final Optional<InputStream> bindingPropertiesInAncestorPaths = IntStream.iterate(dirPathComponents.size(), i -> i - 1)
-            .limit(dirPathComponents.size() - 1)
-            .boxed()
-            .map(i -> dirPathComponents.subList(0, i))
-            .map(list -> list.stream()
-                .collect(Collectors.joining("/", "/", "/" + propertiesFilename)))
-            .<Optional<InputStream>> map(newPath -> {
-                try {
-                    URL url = new URL(baseUrl, newPath);
-                    InputStream inputStream = url.openStream();
-                    return Optional.of(inputStream);
-                } catch (IOException e) {
-                    return Optional.empty();
-                }
-            })
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .findFirst();
 
-        return bindingPropertiesInAncestorPaths.orElseGet(() -> {
-            // Before giving up, try just grabbing it from the current directory
-            File possible = new File(fileName);
-            if (possible.exists()) {
-                try {
-                    return new FileInputStream(possible);
-                } catch (FileNotFoundException e) {
-                    return null;
-                }
-            }
-            // No file found
-            return null;
-        });
+		final Optional<InputStream> bindingPropertiesInAncestorPaths = pathsToRoot(baseUrl.getPath())
+			//skip the path that still contains the filename - we're gonna append that to every parent path anyway
+			.skip(1)
+			.map(newPath -> {
+				try {
+					URL url = new URL(baseUrl, newPath + "/" + fileName);
+					InputStream inputStream = url.openStream();
+					return Optional.of(inputStream);
+				} catch (IOException e) {
+					return Optional.<InputStream> empty();
+				}
+			})
+			.filter(Optional::isPresent)
+			.map(Optional::get)
+			.findFirst();
 
-    }
+		return bindingPropertiesInAncestorPaths.orElseGet(() -> {
+			// Before giving up, try just grabbing it from the current directory
+			File possible = new File(fileName);
+			if (possible.exists()) {
+				try {
+					return new FileInputStream(possible);
+				} catch (FileNotFoundException e) {
+					return null;
+				}
+			}
+			// No file found
+			return null;
+		});
+
+	}
+
+	static Stream<String> pathsToRoot(String path) {
+		final List<String> componentsWithFile = Arrays.asList(path.split("/"));
+		final List<String> pathComponents = componentsWithFile.subList(0, componentsWithFile.size());
+		final Stream<String> pathsToRoot = IntStream.iterate(pathComponents.size(), i -> i - 1)
+			.limit(pathComponents.size())
+			.boxed()
+			.map(i -> pathComponents.subList(0, i))
+			.filter(list -> !Arrays.asList("").equals(list)) //filter out empty path component before leading /
+			.map(list -> list.stream()
+				.collect(Collectors.joining("/")));
+		return pathsToRoot;
+	}
 
 }
