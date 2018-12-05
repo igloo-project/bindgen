@@ -101,8 +101,7 @@ public class ConfUtil {
 	}
 
 	static Stream<String> pathsToRoot(String path) {
-		final List<String> componentsWithFile = Arrays.asList(path.split("/"));
-		final List<String> pathComponents = componentsWithFile.subList(0, componentsWithFile.size());
+		final List<String> pathComponents = Arrays.asList(path.split("/"));
 		final Stream<String> pathsToRoot = IntStream.iterate(pathComponents.size(), i -> i - 1)
 			.limit(pathComponents.size())
 			.boxed()
