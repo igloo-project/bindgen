@@ -69,7 +69,7 @@ public class ConfUtil {
 		}
 
 		final Optional<InputStream> bindingPropertiesInAncestorPaths = pathsToRoot(baseUrl.getPath())
-			//skip the path that still contains the filename - we're gonna append that to every parent path anyway
+			// Skip the path that still contains the filename - we're gonna append that to every parent path anyway
 			.skip(1)
 			.map(newPath -> {
 				try {
@@ -106,7 +106,7 @@ public class ConfUtil {
 			.limit(pathComponents.size())
 			.boxed()
 			.map(i -> pathComponents.subList(0, i))
-			.filter(list -> !Arrays.asList("").equals(list)) //filter out empty path component before leading /
+			.filter(list -> !Arrays.asList("").equals(list)) // Filter out empty path component before leading /
 			.map(list -> list.stream()
 				.collect(Collectors.joining("/")));
 		return pathsToRoot;
