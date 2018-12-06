@@ -5,10 +5,12 @@ import javax.tools.FileObject;
 import javax.tools.JavaFileManager.Location;
 import javax.tools.StandardLocation;
 import java.io.*;
-import java.net.URL;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
 import java.util.stream.Stream;
 
 public class ConfUtil {
@@ -59,22 +61,20 @@ public class ConfUtil {
 	 */
 	private static InputStream resolveBindgenPropertiesIfExists(Location location, ProcessingEnvironment env, String fileName) {
 		final FileObject fileObject;
-		final URL baseUrl;
 		try {
 			fileObject = env.getFiler().getResource(location, "", fileName);
-			baseUrl = fileObject.toUri()
-				.toURL();
 		} catch (IOException e1) {
 			return null;
 		}
 
-		final Optional<InputStream> bindingPropertiesInAncestorPaths = pathsToRoot(baseUrl.getPath())
-			// Skip the path that still contains the filename - we're gonna append that to every parent path anyway
+		final Path path = Paths.get(fileObject.toUri());
+		final Optional<InputStream> bindingPropertiesInAncestorPaths = pathWithParents(path)
+			//skip the path that still contains the filename - we're gonna append that to every parent path anyway
 			.skip(1)
 			.map(newPath -> {
 				try {
-					URL url = new URL(baseUrl, newPath + "/" + fileName);
-					InputStream inputStream = url.openStream();
+					final Path resolve = newPath.resolve(fileName);
+					InputStream inputStream = resolve.toUri().toURL().openStream();
 					return Optional.of(inputStream);
 				} catch (IOException e) {
 					return Optional.<InputStream> empty();
@@ -100,16 +100,27 @@ public class ConfUtil {
 
 	}
 
-	static Stream<String> pathsToRoot(String path) {
-		final List<String> pathComponents = Arrays.asList(path.split("/"));
-		final Stream<String> pathsToRoot = IntStream.iterate(pathComponents.size(), i -> i - 1)
-			.limit(pathComponents.size())
-			.boxed()
-			.map(i -> pathComponents.subList(0, i))
-			.filter(list -> !Arrays.asList("").equals(list)) // Filter out empty path component before leading /
-			.map(list -> list.stream()
-				.collect(Collectors.joining("/")));
-		return pathsToRoot;
+    /**
+     * <p>
+     *     Returns a {@link Stream} of {@link Path}s containing the given path and all it's parent paths.
+     *     If the path is absolute path, it will return all paths starting with the current path,
+     *     the current path's parent, etc., with the last element of the stream being the filesystem root.
+     * </p>
+     * <p>
+     *     If this is a relative path, it will return all paths starting with the current path,
+     *     the current path's parent, etc., up to the topmost path component of the the given path.
+     * </p>
+     *
+     * @param path a {@link Path}
+     * @return a {@link Stream} of {@link Path} objects corresponding to the above
+     */
+    static Stream<Path> pathWithParents(Path path) {
+		final Stream.Builder<Path> builder = Stream.builder();
+		while (path != null) {
+			builder.add(path);
+			path = path.getParent();
+		}
+		return builder.build();
 	}
 
 }
