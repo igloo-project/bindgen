@@ -100,21 +100,25 @@ public class ConfUtil {
 
 	}
 
-    /**
-     * <p>
-     *     Returns a {@link Stream} of {@link Path}s containing the given path and all it's parent paths.
-     *     If the path is absolute path, it will return all paths starting with the current path,
-     *     the current path's parent, etc., with the last element of the stream being the filesystem root.
-     * </p>
-     * <p>
-     *     If this is a relative path, it will return all paths starting with the current path,
-     *     the current path's parent, etc., up to the topmost path component of the the given path.
-     * </p>
-     *
-     * @param path a {@link Path}
-     * @return a {@link Stream} of {@link Path} objects corresponding to the above
-     */
-    static Stream<Path> pathWithParents(Path path) {
+	/**
+	 * <p>
+	 * Returns a {@link Stream} of {@link Path}s containing the given path and
+	 * all it's parent paths. If the path is absolute path, it will return all
+	 * paths starting with the current path, the current path's parent, etc.,
+	 * with the last element of the stream being the filesystem root.
+	 * </p>
+	 * <p>
+	 * If this is a relative path, it will return all paths starting with the
+	 * current path, the current path's parent, etc., up to the topmost path
+	 * component of the the given path.
+	 * </p>
+	 *
+	 * @param path
+	 *            a {@link Path}
+	 * @return a {@link Stream} of {@link Path} objects corresponding to the
+	 *         above
+	 */
+	static Stream<Path> pathWithParents(Path path) {
 		final Stream.Builder<Path> builder = Stream.builder();
 		while (path != null) {
 			builder.add(path);
