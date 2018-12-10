@@ -1,10 +1,10 @@
 package org.bindgen.processor.util;
 
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.tools.FileObject;
-import javax.tools.JavaFileManager.Location;
-import javax.tools.StandardLocation;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedHashMap;
@@ -13,34 +13,46 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Stream;
 
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.tools.FileObject;
+import javax.tools.JavaFileManager.Location;
+import javax.tools.StandardLocation;
+
 public class ConfUtil {
 
 	/** Attempts to load {@code fileName} and return its properties. */
 	public static Map<String, String> loadProperties(ProcessingEnvironment env, String fileName) {
 		Map<String, String> properties = new LinkedHashMap<String, String>();
 
+		Properties p = new Properties();
+		try (InputStream is = resolveBindgenPropertiesIfExists(env, fileName)) {
+			if (is != null) {
+				p.load(is);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		for (Map.Entry<Object, Object> entry : p.entrySet()) {
+			properties.put((String) entry.getKey(), (String) entry.getValue());
+		}
+
+		return properties;
+	}
+
+	/**
+	 * @See {@link #resolveBindgenPropertiesIfExists(Location, ProcessingEnvironment, String)}
+	 */
+	private static InputStream resolveBindgenPropertiesIfExists(ProcessingEnvironment env, String fileName) {
 		// Eclipse, ant, and maven all act a little differently here, so try both source and class output
 		InputStream inputStream = null;
 		for (Location location : new Location[] { StandardLocation.SOURCE_OUTPUT, StandardLocation.CLASS_OUTPUT }) {
 			inputStream = resolveBindgenPropertiesIfExists(location, env, fileName);
 			if (inputStream != null) {
-				break;
+				return inputStream;
 			}
 		}
-
-		if (inputStream != null) {
-			Properties p = new Properties();
-			try (InputStream is = inputStream) {
-				p.load(is);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			for (Map.Entry<Object, Object> entry : p.entrySet()) {
-				properties.put((String) entry.getKey(), (String) entry.getValue());
-			}
-		}
-
-		return properties;
+		return inputStream;
 	}
 
 	/** Finds a file by starting by <code>location</code> and walkig up.
