@@ -89,7 +89,7 @@ public class BoundClass {
 	}
 
 	public String getBindingPathClassSuperClass() {
-		return String.format("%1s<%2s, %3s, %4s>",
+		return String.format("%s<%s, %s, %s>",
 			CurrentEnv.getConfig().bindingPathSuperClassName(), rootTypeArgument, parentTypeArgument, this.name.get());
 	}
 
