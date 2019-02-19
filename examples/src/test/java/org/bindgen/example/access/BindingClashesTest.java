@@ -10,7 +10,9 @@ public class BindingClashesTest extends TestCase {
 
 		assertEquals(BindingClashes.class, b.getType());
 		assertEquals("1", b.type().get());
+		assertEquals(String.class, b.type().getType());
 		assertEquals("2", b.getTypeBinding().get());
+		assertEquals(String.class, b.property().getType());
 	}
 
 	public void testPath() {
