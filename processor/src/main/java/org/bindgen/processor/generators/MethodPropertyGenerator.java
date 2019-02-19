@@ -153,7 +153,7 @@ public class MethodPropertyGenerator extends AbstractGenerator implements Proper
 				setterLambda = "(item, value) -> item.{}(value)";
 			}
 
-			if (!this.property.shouldGenerateBindingClassForType() && !this.property.existsFieldTypeBindingFor()) {
+			if (!"null".equals(type)) {
 				fieldGet.body.line(
 						String.format("    this.{} = new {}(\"{}\", {}, this, (item) -> item.{}(), %s);", setterLambda),
 						this.property.getName(), this.property.getInnerClassSuperClass(), this.property.getName(), type,
