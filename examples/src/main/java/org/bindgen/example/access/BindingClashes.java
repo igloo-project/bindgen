@@ -5,6 +5,8 @@ import org.bindgen.Bindable;
 @Bindable
 public class BindingClashes {
 
+	public String property = "0";
+
 	public String type() {
 		return "1";
 	}
