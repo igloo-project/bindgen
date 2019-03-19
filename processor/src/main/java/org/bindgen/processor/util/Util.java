@@ -1,6 +1,7 @@
 package org.bindgen.processor.util;
 
-import static org.bindgen.processor.CurrentEnv.*;
+import static org.bindgen.processor.CurrentEnv.getElementUtils;
+import static org.bindgen.processor.CurrentEnv.getTypeUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +17,7 @@ import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
-import javax.lang.model.util.SimpleTypeVisitor6;
+import javax.lang.model.util.SimpleTypeVisitor8;
 import javax.lang.model.util.Types;
 
 import joist.sourcegen.Access;
@@ -115,7 +116,7 @@ public class Util {
 	 * @return
 	 */
 	public static String getTypeName(TypeMirror type) {
-		return type.accept(new SimpleTypeVisitor6<String, Void>(type.toString()) {
+		return type.accept(new SimpleTypeVisitor8<String, Void>(type.toString()) {
 
 			@Override
 			public String visitDeclared(DeclaredType t, Void p) {
