@@ -26,6 +26,7 @@ import org.bindgen.processor.GenerationQueue;
 import org.bindgen.processor.Processor;
 import org.bindgen.processor.util.BoundClass;
 import org.bindgen.processor.util.ClassName;
+import org.bindgen.processor.util.Util;
 
 /** Generates a BindKeyword class with "bind" static helper methods.
  *
@@ -86,7 +87,7 @@ public class BindKeywordGenerator {
 		if (type.getTypeArguments().size() > 0) {
 			GMethod method = this.bindClass.getMethod("bind({}<{}> o)", className, Join.commaSpace(bindingType.getGenericPartWithoutBrackets()));
 			method.returnType("{}", bindingType);
-			method.typeParameters(Join.commaSpace(new ClassName(type.toString()).getGenericsWithBounds()));
+			method.typeParameters(Join.commaSpace(new ClassName(Util.getTypeName(type)).getGenericsWithBounds()));
 			method.setStatic();
 			method.body.line("return new {}(o);", bindingType);
 		} else {
