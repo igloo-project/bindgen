@@ -158,11 +158,15 @@ public class BindgenConfig {
 
 	private Scope<ClassName> getBindingExclude() {
 		String scopeExpression = this.options.get(EXCLUDE_PARAM);
-
+		
+//		with java 11, ModuleDescriptor (new class) is broken as it contains
+//		embedded-embedded static definitions, to it creates module
+//		org.bindgen.java.lang.module.ModuleDescriptor.class1.Class2Binding
+//		but references it as ModuleDescriptor.Class2Binding in generated classes
 		if (scopeExpression == null) {
-			scopeExpression = "java.util.stream";
+			scopeExpression = "java.lang.module.ModuleDescriptor";
 		} else {
-			scopeExpression += ",java.util.stream";
+			scopeExpression += ",java.lang.module.ModuleDescriptor";
 		}
 
 		return new PackageExpressionScope(scopeExpression);

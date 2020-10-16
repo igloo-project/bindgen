@@ -20,6 +20,8 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.SimpleTypeVisitor8;
 import javax.lang.model.util.Types;
 
+import org.bindgen.processor.CurrentEnv;
+
 import joist.sourcegen.Access;
 import joist.util.Inflector;
 
@@ -120,7 +122,12 @@ public class Util {
 
 			@Override
 			public String visitDeclared(DeclaredType t, Void p) {
-				return t.toString();
+				// with java 11, previous implementation - t.toString() -
+				// no longer works as it includes annotations
+				// in AnnotatedTypeUseTest, it generates @org.bindgen.processor.annotatedtypeuse.TypeAnnotation java.lang.String
+				// this new implementation creates a new declared type from type element and arguments
+				// so that it strips annotation
+				return CurrentEnv.getTypeUtils().getDeclaredType((TypeElement) t.asElement(), t.getTypeArguments().toArray(new TypeMirror[0])).toString();
 			}
 
 		}, null);

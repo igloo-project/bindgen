@@ -5,6 +5,9 @@ stages:
   - analyze
   - deploy
 
+variables:
+  JAVA_HOME: /usr/lib/jvm/java-11-openjdk
+
 maven-prepare:
   stage: prepare
   script:
