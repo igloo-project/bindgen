@@ -27,7 +27,13 @@ maven-test:
   environment: staging
   script:
     - "source gitlab-ci.build.conf"
-    - "./ci/maven-allure.sh"
+    - mvn verify
+  artifacts:
+    when: always
+    expire_in: 30 days
+    reports:
+      junit:
+        - "**/surefire-reports/*.xml"
 
 maven-deploy:
   stage: deploy
