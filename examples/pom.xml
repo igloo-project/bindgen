@@ -12,10 +12,6 @@
 	
 	<name>Bindgen (examples)</name>
 
-	<properties>
-		<allure.report>report</allure.report>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.bindgen</groupId>
@@ -28,16 +24,6 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-		</dependency>
-
-		<!-- Allure related -->
-		<dependency>
-			<groupId>io.qameta.allure</groupId>
-			<artifactId>allure-junit4</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.tngtech.java</groupId>
-			<artifactId>junit-dataprovider</artifactId>
 		</dependency>
 	</dependencies>
 
