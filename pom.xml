@@ -11,6 +11,7 @@
 
 	<properties>
 		<bindgen.java.version>11</bindgen.java.version>
+		<bindgen.slf4j.version>1.7.31</bindgen.slf4j.version>
 
 		<maven.jgitflow.version>1.0-m5.1</maven.jgitflow.version>
 		<maven.compiler.version>3.8.1</maven.compiler.version>
@@ -19,6 +20,7 @@
 		<maven.source.version>3.2.1</maven.source.version>
 		<maven.javadoc.version>3.2.0</maven.javadoc.version>
 		<maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
+		<maven-enforcer-plugin.version>3.0.0-M3</maven-enforcer-plugin.version>
 
 		<joist.version>1.13.3</joist.version>
 		<junit.version>4.13.2</junit.version>
@@ -28,6 +30,8 @@
 		<maven.javadoc.failOnError>false</maven.javadoc.failOnError>
 
 		<jsch.version>0.1.55</jsch.version>
+		<minimal.jdk.version>11</minimal.jdk.version>
+		<minimal.maven.version>3.3</minimal.maven.version>
 	</properties>
 
 	<modules>
@@ -49,16 +53,53 @@
 				<scope>test</scope>
 				<version>${junit.version}</version>
 			</dependency>
+
+			<!-- joist:joist-util dependency: override version -->
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>${bindgen.slf4j.version}</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
 	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+			</plugin>
+		</plugins>
 		<pluginManagement>
 			<plugins>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
 					<version>${maven-surefire-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-enforcer-plugin</artifactId>
+					<version>${maven-enforcer-plugin.version}</version>
+					<executions>
+						<execution>
+							<id>enforce</id>
+							<goals>
+								<goal>enforce</goal>
+							</goals>
+							<configuration>
+								<rules>
+									<requireUpperBoundDeps />
+									<requireMavenVersion>
+										<version>[${minimal.maven.version},)</version>
+									</requireMavenVersion>
+									<requireJavaVersion>
+										<version>${minimal.jdk.version}</version>
+									</requireJavaVersion>
+								</rules>
+							</configuration>
+						</execution>
+					</executions>
 				</plugin>
 				<plugin>
 					<groupId>external.atlassian.jgitflow</groupId>
