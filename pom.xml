@@ -50,11 +50,10 @@
 			<dependency>
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
-				<scope>test</scope>
 				<version>${junit.version}</version>
 			</dependency>
 
-			<!-- joist:joist-util dependency: override version -->
+			<!-- joist:joist-util dependency: override version (requireUpperBoundDeps constraint) -->
 			<dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-api</artifactId>
