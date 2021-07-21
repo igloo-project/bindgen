@@ -11,7 +11,7 @@
 
 	<properties>
 		<bindgen.java.version>11</bindgen.java.version>
-		<bindgen.slf4j.version>1.7.31</bindgen.slf4j.version>
+		<bindgen.slf4j.version>1.7.32</bindgen.slf4j.version>
 
 		<maven.jgitflow.version>1.0-m5.1</maven.jgitflow.version>
 		<maven.compiler.version>3.8.1</maven.compiler.version>
