@@ -1,32 +1,24 @@
+image:
+  name: maven:3.8-openjdk-11
+
 stages:
-  - prepare
   - build
   - test
   - analyze
   - deploy
-
-variables:
-  JAVA_HOME: /usr/lib/jvm/java-11-openjdk
-
-maven-prepare:
-  stage: prepare
-  script:
-    - "./ci/config-test.py"
-  artifacts:
-    paths:
-      - gitlab-ci.build.conf
 
 maven-build:
   stage: build
   environment: staging
   script:
     - "mvn -DskipTests clean compile"
+  tags:
+    - docker
 
 maven-test:
   stage: test
   environment: staging
   script:
-    - "source gitlab-ci.build.conf"
     - mvn verify
   artifacts:
     when: always
@@ -34,6 +26,8 @@ maven-test:
     reports:
       junit:
         - "**/surefire-reports/*.xml"
+  tags:
+    - docker
 
 maven-deploy:
   stage: deploy
@@ -46,12 +40,15 @@ maven-deploy:
     - /^ft-.*-deploy$/
     - /^rl-.*$/
     - /^hf-.*$/
+  tags:
+    - docker
 
 sonar-analyze:
   stage: analyze
   environment: staging
   script:
-    - "source gitlab-ci.build.conf"
     - mvn clean verify sonar:sonar
       -DskipTests
       -Dsonar.host.url="https://sonar.tools.kobalt.fr"
+  tags:
+    - docker
