@@ -1,3 +1,15 @@
+## 5.0.0 (2021-07)
+
+* Java 11 (source and target) release
+
+## 4.0.2 (2018-11)
+
+### Bugfix
+
+* Load bindgen.properties in a path containing spaces (thanks to nandor.fekete@gmail.com)
+* Fix symbol conflict for generic types: symbol availability is now extracted (thanks to nandor.fekete@gmail.com)
+* Fix broken getType() method for some corner cases
+
 ## 4.0.1 (2018-11-17)
 
 ### Bugfix

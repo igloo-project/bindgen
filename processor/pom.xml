@@ -5,16 +5,12 @@
 	<parent>
 		<groupId>org.bindgen</groupId>
 		<artifactId>bindgen-parent</artifactId>
-		<version>4.0.2</version>
+		<version>5.0.0</version>
 	</parent>
 	
 	<artifactId>bindgen</artifactId>
 	
 	<name>Bindgen</name>
-
-	<properties>
-		<allure.report>report</allure.report>
-	</properties>
 
 	<dependencies>
 		<dependency>
@@ -26,16 +22,6 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-		</dependency>
-
-		<!-- Allure related -->
-		<dependency>
-			<groupId>io.qameta.allure</groupId>
-			<artifactId>allure-junit4</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.tngtech.java</groupId>
-			<artifactId>junit-dataprovider</artifactId>
 		</dependency>
 	</dependencies>
 

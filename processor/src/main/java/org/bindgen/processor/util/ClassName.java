@@ -65,7 +65,7 @@ public class ClassName {
 	public List<String> getGenericsWithoutBounds() {
 		List<String> args = new ArrayList<String>();
 		for (TypeMirror tv : this.getDeclaredType().getTypeArguments()) {
-			args.add(tv.toString());
+			args.add(Util.getTypeName(tv));
 		}
 		return args;
 	}
@@ -79,9 +79,9 @@ public class ClassName {
 		@SuppressWarnings("unchecked")
 		List<TypeVariable> typeVariables = (List<TypeVariable>) this.getDeclaredType().getTypeArguments();
 		for (TypeVariable tv : typeVariables) {
-			String arg = tv.toString();
+			String arg = Util.getTypeName(tv);
 			if (!Util.isOfTypeObjectOrNone(tv.getUpperBound())) {
-				arg += " extends " + tv.getUpperBound().toString();
+				arg += " extends " + Util.getTypeName(tv.getUpperBound());
 			}
 			args.add(arg);
 		}

@@ -29,7 +29,7 @@ public class BoundClass {
 
 	public BoundClass(TypeElement element) {
 		this.element = element;
-		this.name = new ClassName(Util.boxIfNeeded(element.asType()).toString());
+		this.name = new ClassName(Util.getTypeName(Util.boxIfNeeded(element.asType())));
 		this.parentTypeArgument = findAvailableTypeArgumentName(element, "P", "PARENT", "PARENT_TYPE");
 		this.rootTypeArgument = findAvailableTypeArgumentName(element, "R", "ROOT", "ROOT_TYPE");
 	}

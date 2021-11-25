@@ -1,18 +1,23 @@
 package org.bindgen.processor.generators;
 
-import static org.bindgen.processor.CurrentEnv.*;
+import static org.bindgen.processor.CurrentEnv.getConfig;
+import static org.bindgen.processor.CurrentEnv.getElementUtils;
+import static org.bindgen.processor.CurrentEnv.getFiler;
+import static org.bindgen.processor.CurrentEnv.getMessager;
 
 import java.io.IOException;
 import java.io.Writer;
 import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
-import javax.annotation.Generated;
+import javax.annotation.processing.Generated;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.TypeParameterElement;
 import javax.tools.Diagnostic.Kind;
 import javax.tools.JavaFileObject;
 

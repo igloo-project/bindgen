@@ -1,6 +1,7 @@
 package org.bindgen.processor.util;
 
-import static org.bindgen.processor.CurrentEnv.*;
+import static org.bindgen.processor.CurrentEnv.getElementUtils;
+import static org.bindgen.processor.CurrentEnv.getTypeUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,8 +17,10 @@ import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
-import javax.lang.model.util.SimpleTypeVisitor6;
+import javax.lang.model.util.SimpleTypeVisitor8;
 import javax.lang.model.util.Types;
+
+import org.bindgen.processor.CurrentEnv;
 
 import joist.sourcegen.Access;
 import joist.util.Inflector;
@@ -58,7 +61,7 @@ public class Util {
 	}
 
 	public static boolean isOfTypeObjectOrNone(TypeMirror type) {
-		return type.getKind() == TypeKind.NONE || type.toString().equals("java.lang.Object");
+		return type.getKind() == TypeKind.NONE || Util.getTypeName(type).equals("java.lang.Object");
 	}
 
 	/**
@@ -115,11 +118,16 @@ public class Util {
 	 * @return
 	 */
 	public static String getTypeName(TypeMirror type) {
-		return type.accept(new SimpleTypeVisitor6<String, Void>(type.toString()) {
+		return type.accept(new SimpleTypeVisitor8<String, Void>(type.toString()) {
 
 			@Override
 			public String visitDeclared(DeclaredType t, Void p) {
-				return t.toString();
+				// with java 11, previous implementation - t.toString() -
+				// no longer works as it includes annotations
+				// in AnnotatedTypeUseTest, it generates @org.bindgen.processor.annotatedtypeuse.TypeAnnotation java.lang.String
+				// this new implementation creates a new declared type from type element and arguments
+				// so that it strips annotation
+				return CurrentEnv.getTypeUtils().getDeclaredType((TypeElement) t.asElement(), t.getTypeArguments().toArray(new TypeMirror[0])).toString();
 			}
 
 		}, null);
