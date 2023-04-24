@@ -15,7 +15,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.processing.Generated;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic.Kind;
@@ -30,6 +29,7 @@ import org.bindgen.processor.Processor;
 import org.bindgen.processor.util.BoundClass;
 import org.bindgen.processor.util.Util;
 
+import jakarta.annotation.Generated;
 import joist.sourcegen.Argument;
 import joist.sourcegen.GClass;
 import joist.sourcegen.GMethod;

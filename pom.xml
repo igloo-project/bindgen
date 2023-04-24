@@ -37,6 +37,8 @@
 		<jsch.version>0.1.55</jsch.version>
 		<minimal.jdk.version>11</minimal.jdk.version>
 		<minimal.maven.version>3.5.2</minimal.maven.version>
+		
+		<jakarta.version>2.1.1</jakarta.version>
 	</properties>
 
 	<modules>
@@ -63,6 +65,12 @@
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-api</artifactId>
 				<version>${bindgen.slf4j.version}</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>jakarta.annotation</groupId>
+				<artifactId>jakarta.annotation-api</artifactId>
+				<version>${jakarta.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
