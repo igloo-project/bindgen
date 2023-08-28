@@ -4,13 +4,13 @@
 
 	<artifactId>bindgen-parent</artifactId>
 	<groupId>org.bindgen</groupId>
-	<version>5.0.0</version>
+	<version>6.0.0</version>
 	<packaging>pom</packaging>
 
 	<name>Bindgen (parent)</name>
 
 	<properties>
-		<bindgen.java.version>11</bindgen.java.version>
+		<maven.compiler.release>17</maven.compiler.release>
 		<bindgen.slf4j.version>1.7.32</bindgen.slf4j.version>
 
 		<maven.jgitflow.version>1.0-m5.1</maven.jgitflow.version>
@@ -37,6 +37,8 @@
 		<jsch.version>0.1.55</jsch.version>
 		<minimal.jdk.version>11</minimal.jdk.version>
 		<minimal.maven.version>3.5.2</minimal.maven.version>
+		
+		<jakarta.version>2.1.1</jakarta.version>
 	</properties>
 
 	<modules>
@@ -63,6 +65,12 @@
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-api</artifactId>
 				<version>${bindgen.slf4j.version}</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>jakarta.annotation</groupId>
+				<artifactId>jakarta.annotation-api</artifactId>
+				<version>${jakarta.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -154,12 +162,10 @@
 					</dependencies>
 				</plugin>
 				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>${maven.compiler.version}</version>
 					<configuration>
-						<source>${bindgen.java.version}</source>
-						<target>${bindgen.java.version}</target>
-						<release>${bindgen.java.version}</release>
 						<compilerArgument>-proc:none</compilerArgument>
 						<testCompilerArgument>-proc:none</testCompilerArgument>
 					</configuration>

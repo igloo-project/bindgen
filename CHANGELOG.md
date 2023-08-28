@@ -1,3 +1,7 @@
+## 6.0.0 (2023-08)
+
+* Java 17 (source and target) release
+
 ## 5.0.0 (2021-07)
 
 * Java 11 (source and target) release

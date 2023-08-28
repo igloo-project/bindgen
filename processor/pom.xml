@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.bindgen</groupId>
 		<artifactId>bindgen-parent</artifactId>
-		<version>5.0.0</version>
+		<version>6.0.0</version>
 	</parent>
 	
 	<artifactId>bindgen</artifactId>
@@ -22,6 +22,13 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>jakarta.annotation</groupId>
+			<artifactId>jakarta.annotation-api</artifactId>
+			<optional>true</optional>
 		</dependency>
 	</dependencies>
 
