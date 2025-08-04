@@ -4,7 +4,6 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.util.Set;
-
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
@@ -17,7 +16,6 @@ import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic.Kind;
 import javax.tools.FileObject;
 import javax.tools.StandardLocation;
-
 import org.bindgen.Bindable;
 
 /**
@@ -55,8 +53,10 @@ public class Processor extends AbstractProcessor {
 	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
 		try {
 			for (Element element : roundEnv.getElementsAnnotatedWith(Bindable.class)) {
-				if (element.getKind() == ElementKind.CLASS || element.getKind() == ElementKind.INTERFACE
-						|| element.getKind() == ElementKind.ENUM) {
+				if (element.getKind() == ElementKind.CLASS 
+						|| element.getKind() == ElementKind.INTERFACE
+						|| element.getKind() == ElementKind.ENUM 
+						|| element.getKind() == ElementKind.RECORD) {
 					TypeElement type = (TypeElement) element;
 
 					if (CurrentEnv.getConfig().shouldGenerateBindingFor(type)) {
