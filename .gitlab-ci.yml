@@ -47,7 +47,7 @@ sonar-analyze:
   stage: analyze
   environment: staging
   script:
-    - mvn clean verify sonar:sonar
+    - mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
       -DskipTests
       -Dsonar.host.url="https://sonar.tools.kobalt.fr"
   tags:
