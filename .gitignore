@@ -8,3 +8,5 @@ gitlab-ci.build.conf
 
 .*.swp
 .allure
+.idea/
+*.iml

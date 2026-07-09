@@ -4,16 +4,15 @@
 
 	<artifactId>bindgen-parent</artifactId>
 	<groupId>org.bindgen</groupId>
-	<version>5.0.0</version>
+	<version>5.1.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Bindgen (parent)</name>
 
 	<properties>
-		<bindgen.java.version>11</bindgen.java.version>
+		<maven.compiler.release>17</maven.compiler.release>
 		<bindgen.slf4j.version>1.7.32</bindgen.slf4j.version>
 
-		<maven.jgitflow.version>1.0-m5.1</maven.jgitflow.version>
 		<maven.compiler.version>3.8.1</maven.compiler.version>
 		<maven.processor.version>4.4</maven.processor.version>
 		<maven.deploy.version>3.0.0-M1</maven.deploy.version>
@@ -26,6 +25,7 @@
 		<maven.site.version>3.9.1</maven.site.version>
 		<maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
 		<maven-enforcer-plugin.version>3.0.0-M3</maven-enforcer-plugin.version>
+		<maven.gitflow-maven-plugin.version>1.21.0</maven.gitflow-maven-plugin.version>
 
 		<joist.version>1.13.3</joist.version>
 		<junit.version>4.13.2</junit.version>
@@ -35,7 +35,7 @@
 		<maven.javadoc.failOnError>false</maven.javadoc.failOnError>
 
 		<jsch.version>0.1.55</jsch.version>
-		<minimal.jdk.version>11</minimal.jdk.version>
+		<minimal.jdk.version>17</minimal.jdk.version>
 		<minimal.maven.version>3.5.2</minimal.maven.version>
 	</properties>
 
@@ -131,19 +131,19 @@
 					</executions>
 				</plugin>
 				<plugin>
-					<groupId>external.atlassian.jgitflow</groupId>
-					<artifactId>jgitflow-maven-plugin</artifactId>
-					<version>${maven.jgitflow.version}</version>
+					<groupId>com.amashchenko.maven.plugin</groupId>
+					<artifactId>gitflow-maven-plugin</artifactId>
+					<version>${maven.gitflow-maven-plugin.version}</version>
 					<configuration>
-						<autoVersionSubmodules>true</autoVersionSubmodules>
-						<flowInitContext>
-							<masterBranchName>master</masterBranchName>
-							<developBranchName>dev</developBranchName>
-							<featureBranchPrefix>ft-</featureBranchPrefix>
-							<releaseBranchPrefix>rl-</releaseBranchPrefix>
-							<hotfixBranchPrefix>hf-</hotfixBranchPrefix>
+						<gitFlowConfig>
+							<productionBranch>v5-main</productionBranch>
+							<developmentBranch>v5-dev</developmentBranch>
+							<featureBranchPrefix>v5-ft-</featureBranchPrefix>
+							<releaseBranchPrefix>v5-rl-</releaseBranchPrefix>
+							<hotfixBranchPrefix>v5-hf-</hotfixBranchPrefix>
 							<versionTagPrefix>v</versionTagPrefix>
-						</flowInitContext>
+							<origin>origin</origin>
+						</gitFlowConfig>
 					</configuration>
 					<dependencies>
 						<dependency>
@@ -154,12 +154,10 @@
 					</dependencies>
 				</plugin>
 				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>${maven.compiler.version}</version>
 					<configuration>
-						<source>${bindgen.java.version}</source>
-						<target>${bindgen.java.version}</target>
-						<release>${bindgen.java.version}</release>
 						<compilerArgument>-proc:none</compilerArgument>
 						<testCompilerArgument>-proc:none</testCompilerArgument>
 					</configuration>

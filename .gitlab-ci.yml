@@ -1,5 +1,5 @@
 image:
-  name: maven:3.8-openjdk-11
+  name: maven:3.8-openjdk-17
 
 stages:
   - build
@@ -34,12 +34,11 @@ maven-deploy:
   environment: staging
   script:
     - "mvn deploy -DskipTests -DperformRelease"
-  only:
-    - /^master$/
-    - /^dev$/
-    - /^ft-.*-deploy$/
-    - /^rl-.*$/
-    - /^hf-.*$/
+  rules:
+    - if: $CI_COMMIT_BRANCH == "v5-main"
+    - if: $CI_COMMIT_BRANCH == "v5-dev"
+    - if: $CI_COMMIT_BRANCH =~ /^v5-ft-.*-deploy$/
+    - if: $CI_COMMIT_BRANCH =~ /^v5-hf-.*$/
   tags:
     - docker
 
