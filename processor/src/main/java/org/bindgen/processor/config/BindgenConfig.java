@@ -191,6 +191,7 @@ public class BindgenConfig {
 		this.options.put("skipAttribute.java.lang.Object.getClass", "true");
 		this.options.put("skipAttribute.java.lang.Object.notify", "true");
 		this.options.put("skipAttribute.java.lang.Object.notifyAll", "true");
+		this.options.put("skipAttribute.java.lang.Enum.describeConstable", "true");
 		this.options.put("bindingPathSuperClass", AbstractBinding.class.getName());
 	}
 

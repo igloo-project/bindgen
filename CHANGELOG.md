@@ -1,3 +1,8 @@
+## 5.1.0 (2026-07)
+
+* java 17
+* migration gitflow
+
 ## 5.0.0 (2021-07)
 
 * Java 11 (source and target) release
