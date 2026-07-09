@@ -144,6 +144,21 @@
 							<versionTagPrefix>v</versionTagPrefix>
 							<origin>origin</origin>
 						</gitFlowConfig>
+						<skipFeatureVersion>true</skipFeatureVersion>
+						<!-- do not run verify, done on CI -->
+						<skipTestProject>true</skipTestProject>
+						<!-- In X.Y.Z, update Y -->
+						<versionDigitToIncrement>1</versionDigitToIncrement>
+						<!-- do not push during release; we perform this independently-->
+						<pushRemote>false</pushRemote>
+						<!-- build project during release -->
+						<installProject>true</installProject>
+						<!-- ensure all modules are processed by versions: calls -->
+						<argLine>-DskipTests=true -DprocessAllModules=true -DskipResolution=true</argLine>
+						<!-- print subcommand output -->
+						<verbose>true</verbose>
+						<!-- Needed as it implies project reloading during versioning, and triggers resolution failure -->
+						<updateOutputTimestamp>false</updateOutputTimestamp>
 					</configuration>
 					<dependencies>
 						<dependency>
