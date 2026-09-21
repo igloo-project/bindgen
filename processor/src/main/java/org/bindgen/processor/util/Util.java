@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
-
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
@@ -19,11 +18,9 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.SimpleTypeVisitor8;
 import javax.lang.model.util.Types;
-
-import org.bindgen.processor.CurrentEnv;
-
 import joist.sourcegen.Access;
 import joist.util.Inflector;
+import org.bindgen.processor.CurrentEnv;
 
 public class Util {
 
@@ -38,7 +35,11 @@ public class Util {
 		boolean isTypeElement = bindableClass.getKind().isClass() || bindableClass.getKind().isInterface();
 		if (isTypeElement) {
 			ElementKind enclosingKind = ((TypeElement) bindableClass).getEnclosingElement().getKind();
-			if (enclosingKind == ElementKind.CLASS || enclosingKind == ElementKind.INTERFACE || enclosingKind == ElementKind.ENUM) {
+			if (
+					enclosingKind == ElementKind.CLASS 
+							|| enclosingKind == ElementKind.INTERFACE 
+							|| enclosingKind == ElementKind.ENUM
+							|| enclosingKind == ElementKind.RECORD) {
 				String outerClassName = bindableClass.getEnclosingElement().getSimpleName().toString();
 				if (lowerCase.matcher(outerClassName).find()) {
 					className = className.replace(outerClassName, "bindgen_" + outerClassName);
