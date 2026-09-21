@@ -1,5 +1,5 @@
 image:
-  name: maven:3.8-openjdk-25
+  name: maven:3.9-eclipse-temurin-25
 
 stages:
   - build
