@@ -1,29 +1,37 @@
 package org.bindgen.example;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.List;
 
-import org.junit.Assert;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
 import org.bindgen.ContainerBinding;
 
-public class FieldExampleTest extends TestCase {
+public class FieldExampleTest {
 
+	@Test
 	public void testReadWrite() {
 		FieldExample e = new FieldExample("name");
 		FieldExampleBinding b = new FieldExampleBinding(e);
 
-		Assert.assertEquals("name", b.name().get());
+		assertEquals("name", b.name().get());
 
 		b.name().set("name1");
-		Assert.assertEquals("name1", e.name);
+		assertEquals("name1", e.name);
 	}
 
+	@Test
 	public void testFinal() {
 		FieldExampleBinding b = new FieldExampleBinding();
-		Assert.assertEquals(true, b.finalField().getBindingIsReadOnly());
+		assertEquals(true, b.finalField().getBindingIsReadOnly());
 	}
 
+	@Test
 	public void testListReadWrite() {
 		FieldExample e = new FieldExample("name");
 		FieldExampleBinding b = new FieldExampleBinding(e);
@@ -31,33 +39,36 @@ public class FieldExampleTest extends TestCase {
 		List<String> list = b.list().get();
 		list.add("foo");
 
-		Assert.assertEquals("foo", e.list.get(0));
-		Assert.assertSame(list, b.list().get());
-		Assert.assertEquals(String.class, ((ContainerBinding) b.list()).getContainedType());
+		assertEquals("foo", e.list.get(0));
+		assertSame(list, b.list().get());
+		assertEquals(String.class, ((ContainerBinding) b.list()).getContainedType());
 	}
 
+	@Test
 	public void testPrimitive() {
 		FieldExample e = new FieldExample("name");
 		FieldExampleBinding b = new FieldExampleBinding(e);
-		Assert.assertFalse(b.good().get());
+		assertFalse(b.good().get());
 
 		b.good().set(true);
-		Assert.assertTrue(e.good);
+		assertTrue(e.good);
 	}
 
+	@Test
 	public void testOneCharge() {
 		FieldExample e = new FieldExample("name");
 		FieldExampleBinding b = new FieldExampleBinding(e);
-		Assert.assertEquals(null, b.f().get());
+		assertNull(b.f().get());
 		b.f().set("foo");
-		Assert.assertEquals("foo", e.f);
+		assertEquals("foo", e.f);
 	}
 
+	@Test
 	public void testGet() {
 		FieldExample e = new FieldExample("name");
 		e.get = true;
 		FieldExampleBinding b = new FieldExampleBinding(e);
-		Assert.assertEquals(true, b.getField().get().booleanValue());
+		assertEquals(true, b.getField().get().booleanValue());
 	}
 
 }

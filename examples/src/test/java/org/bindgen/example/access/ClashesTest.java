@@ -1,9 +1,12 @@
 package org.bindgen.example.access;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ClashesTest extends TestCase {
+import org.junit.jupiter.api.Test;
 
+public class ClashesTest {
+
+	@Test
 	public void testEach() {
 		Clashes c = new Clashes();
 		c.a = "A";

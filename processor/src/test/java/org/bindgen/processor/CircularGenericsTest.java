@@ -1,6 +1,6 @@
 package org.bindgen.processor;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /** Tests 'circular' generics references. */
 public class CircularGenericsTest extends AbstractBindgenTestCase {

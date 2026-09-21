@@ -10,37 +10,36 @@
 	<name>Bindgen (parent)</name>
 
 	<properties>
-		<maven.compiler.release>17</maven.compiler.release>
-		<bindgen.java.version>17</bindgen.java.version>
+		<maven.compiler.release>25</maven.compiler.release>
+		<bindgen.java.version>25</bindgen.java.version>
 
-		<bindgen.slf4j.version>1.7.32</bindgen.slf4j.version>
+		<bindgen.slf4j.version>2.0.19</bindgen.slf4j.version>
 
-		<maven.compiler.version>3.8.1</maven.compiler.version>
-		<maven.processor.version>4.4</maven.processor.version>
-		<maven.deploy.version>3.0.0-M1</maven.deploy.version>
-		<maven.source.version>3.2.1</maven.source.version>
-		<maven.javadoc.version>3.2.0</maven.javadoc.version>
-		<maven.clean.version>3.1.0</maven.clean.version>
-		<maven.install.version>3.0.0-M1</maven.install.version>
-		<maven.jar.version>3.2.0</maven.jar.version>
-		<maven.resources.version>3.2.0</maven.resources.version>
-		<maven.site.version>3.9.1</maven.site.version>
-		<maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
-		<maven-enforcer-plugin.version>3.0.0-M3</maven-enforcer-plugin.version>
+		<maven.compiler.version>3.16.0</maven.compiler.version>
+		<maven.processor.version>5.2</maven.processor.version>
+		<maven.deploy.version>3.2.0</maven.deploy.version>
+		<maven.source.version>3.4.0</maven.source.version>
+		<maven.javadoc.version>3.12.0</maven.javadoc.version>
+		<maven.clean.version>3.5.0</maven.clean.version>
+		<maven.install.version>3.2.0</maven.install.version>
+		<maven.jar.version>3.5.1</maven.jar.version>
+		<maven.resources.version>3.5.0</maven.resources.version>
+		<maven.site.version>3.22.0</maven.site.version>
+		<maven-surefire-plugin.version>3.6.0</maven-surefire-plugin.version>
+		<maven-enforcer-plugin.version>3.6.3</maven-enforcer-plugin.version>
 		<maven.gitflow-maven-plugin.version>1.21.0</maven.gitflow-maven-plugin.version>
 
 		<joist.version>1.13.3</joist.version>
-		<junit.version>4.13.2</junit.version>
+		<junit.version>6.1.3</junit.version>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.javadoc.skip>true</maven.javadoc.skip>
 		<maven.javadoc.failOnError>false</maven.javadoc.failOnError>
 
-		<jsch.version>0.1.55</jsch.version>
-		<minimal.jdk.version>17</minimal.jdk.version>
+		<minimal.jdk.version>25</minimal.jdk.version>
 		<minimal.maven.version>3.5.2</minimal.maven.version>
 		
-		<jakarta.version>2.1.1</jakarta.version>
+		<jakarta.version>3.0.0</jakarta.version>
 	</properties>
 
 	<modules>
@@ -57,8 +56,8 @@
 			</dependency>
 
 			<dependency>
-				<groupId>junit</groupId>
-				<artifactId>junit</artifactId>
+				<groupId>org.junit.jupiter</groupId>
+				<artifactId>junit-jupiter-api</artifactId>
 				<version>${junit.version}</version>
 			</dependency>
 
@@ -146,11 +145,11 @@
 					<version>${maven.gitflow-maven-plugin.version}</version>
 					<configuration>
 						<gitFlowConfig>
-							<productionBranch>v5-main</productionBranch>
-							<developmentBranch>v5-dev</developmentBranch>
-							<featureBranchPrefix>v5-ft-</featureBranchPrefix>
-							<releaseBranchPrefix>v5-rl-</releaseBranchPrefix>
-							<hotfixBranchPrefix>v5-hf-</hotfixBranchPrefix>
+							<productionBranch>master</productionBranch>
+							<developmentBranch>dev</developmentBranch>
+							<featureBranchPrefix>ft-</featureBranchPrefix>
+							<releaseBranchPrefix>rl-</releaseBranchPrefix>
+							<hotfixBranchPrefix>hf-</hotfixBranchPrefix>
 							<versionTagPrefix>v</versionTagPrefix>
 							<origin>origin</origin>
 						</gitFlowConfig>

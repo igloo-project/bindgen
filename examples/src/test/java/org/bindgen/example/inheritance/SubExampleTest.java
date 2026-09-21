@@ -1,54 +1,62 @@
 package org.bindgen.example.inheritance;
 
-import org.junit.Assert;
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
 
 import org.bindgen.Binding;
 
-public class SubExampleTest extends TestCase {
+public class SubExampleTest {
 
 	private SubHolder holder = new SubHolder();
 
+	@Test
 	public void testFoo() {
-		Assert.assertEquals(null, this.holder.sub);
+		assertNull(this.holder.sub);
 		SubExample sub = new SubExample();
 
 		SubHolderBinding b = new SubHolderBinding(this.holder);
 		Binding<? super SubExample> bind = b.sub();
 		bind.set(sub);
-		Assert.assertSame(sub, this.holder.sub);
+		assertSame(sub, this.holder.sub);
 
 		b.sub().set(sub);
-		Assert.assertSame(sub, this.holder.sub);
+		assertSame(sub, this.holder.sub);
 	}
 
+	@Test
 	public void testSuperAttribute() {
-		Assert.assertEquals(null, this.holder.sub);
+		assertNull(this.holder.sub);
 
 		SubExample sub = new SubExample();
 		sub.description = "existingInSuper";
 		SubExampleBinding b = new SubExampleBinding(sub);
-		Assert.assertEquals("existingInSuper", b.description().get());
+		assertEquals("existingInSuper", b.description().get());
 
-		Assert.assertEquals(6, b.getChildBindings().size()); // name (and nameField), description, subOnly, hashCode, toString
+		assertEquals(6, b.getChildBindings().size()); // name (and nameField), description, subOnly, hashCode, toString
 	}
 
+	@Test
 	public void testOverriddenCallable() {
 		SubExample sub = new SubExample();
 		SubExampleBinding b = new SubExampleBinding(sub);
 		b.go().run();
-		Assert.assertEquals("insub", sub.name);
+		assertEquals("insub", sub.name);
 	}
 
+	@Test
 	public void testOverriddenCallableWithABaseBinding() {
 		SubExample sub = new SubExample();
 		BaseExampleBinding b = new BaseExampleBinding(sub);
 		b.go().run();
-		Assert.assertEquals("insub", sub.name);
+		assertEquals("insub", sub.name);
 
-		Assert.assertTrue(b.get() instanceof SubExample);
+		assertTrue(b.get() instanceof SubExample);
 		// 4 == description, name, hashCode and toString   -   no subOnly
-		Assert.assertEquals(4, b.getChildBindings().size());
+		assertEquals(4, b.getChildBindings().size());
 	}
 
 }

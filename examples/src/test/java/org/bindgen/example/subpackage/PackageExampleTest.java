@@ -1,18 +1,20 @@
 package org.bindgen.example.subpackage;
 
-import org.junit.Assert;
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class PackageExampleTest extends TestCase {
+import org.junit.jupiter.api.Test;
 
+public class PackageExampleTest {
+
+	@Test
 	public void testReadWrite() {
 		PackageExample e = new PackageExample("name");
 		PackageExampleBinding b = new PackageExampleBinding(e);
 
-		Assert.assertEquals("name", b.name().get());
+		assertEquals("name", b.name().get());
 
 		b.name().set("name1");
-		Assert.assertEquals("name1", e.name);
+		assertEquals("name1", e.name);
 	}
 
 }

@@ -1,15 +1,18 @@
 package org.bindgen.example.interfaceinner;
 
-import org.junit.Assert;
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 import org.bindgen.example.interfaceinner.Outer.Inner;
 import org.bindgen.example.interfaceinner.outer.InnerBinding;
+import org.junit.jupiter.api.Test;
 
-public class BindingTest extends TestCase {
+public class BindingTest {
+  
+  @Test
 	public void testInnerBinding() {
 		InnerBinding b = new InnerBinding(new Inner());
 		b.something().set("string1");
-		Assert.assertEquals("string1", b.something().get());
+		assertEquals("string1", b.something().get());
 	}
 }

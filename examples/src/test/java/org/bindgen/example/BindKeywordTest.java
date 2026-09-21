@@ -1,14 +1,16 @@
 package org.bindgen.example;
 
 import static org.bindgen.BindKeyword.bind;
-import org.junit.Assert;
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class BindKeywordTest extends TestCase {
+import org.junit.jupiter.api.Test;
 
+public class BindKeywordTest {
+
+	@Test
 	public void testWithFieldExample() {
 		SimpleBean e = new SimpleBean("name");
-		Assert.assertEquals("name", bind(e).name().get());
+		assertEquals("name", bind(e).name().get());
 	}
 
 }

@@ -1,8 +1,9 @@
 package org.bindgen.processor;
 
-import static org.junit.Assert.*;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import org.junit.jupiter.api.Test;
 
 public class InnerClassTest extends AbstractBindgenTestCase {
 
@@ -18,10 +19,8 @@ public class InnerClassTest extends AbstractBindgenTestCase {
 		assertNotNull(bindingClass);
 		assertMethodDeclared(bindingClass, "x");
 		assertMethodDeclared(bindingClass, "squared");
-		assertMethodNotDeclared(bindingClass, "foobar"); // does not have access
-															// to protected from
-															// different package
-															// (someClass)
+    // does not have access to protected from different package (someClass)
+		assertMethodNotDeclared(bindingClass, "foobar");
 	}
 
 	@Test

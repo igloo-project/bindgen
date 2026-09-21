@@ -1,21 +1,23 @@
 package org.bindgen.example;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+
 import java.util.HashSet;
 
 import org.bindgen.ContainerBinding;
-import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 
-import junit.framework.TestCase;
-
-public class CollectionExampleTest extends TestCase {
+public class CollectionExampleTest {
 
 	@SuppressWarnings("rawtypes")
+	@Test
 	public void testGetSet() {
 		CollectionExample e = new CollectionExample();
 		e.things = new HashSet();
 
 		CollectionExampleBinding b = new CollectionExampleBinding(e);
-		Assert.assertSame(e.things, b.things().get());
-		Assert.assertEquals(null, ((ContainerBinding) b.things()).getContainedType());
+		assertSame(e.things, b.things().get());
+		assertNull(((ContainerBinding) b.things()).getContainedType());
 	}
 }

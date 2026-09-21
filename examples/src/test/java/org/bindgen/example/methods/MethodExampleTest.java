@@ -1,70 +1,81 @@
 package org.bindgen.example.methods;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import org.bindgen.Binding;
 import org.bindgen.ContainerBinding;
-import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 
-import junit.framework.TestCase;
+public class MethodExampleTest {
 
-public class MethodExampleTest extends TestCase {
-
+	@Test
 	public void testReadWrite() {
 		MethodExample e = new MethodExample("1", "fred");
 		MethodExampleBinding b = new MethodExampleBinding(e);
 
-		Assert.assertEquals("fred", b.name().get());
+		assertEquals("fred", b.name().get());
 
 		b.name().set("bob");
-		Assert.assertEquals("bob", e.getName());
+		assertEquals("bob", e.getName());
 	}
 
+	@Test
 	public void testReadOnly() {
 		MethodExample e = new MethodExample("1", "name");
 		MethodExampleBinding b = new MethodExampleBinding(e);
 
-		Assert.assertEquals("1", b.id().get());
+		assertEquals("1", b.id().get());
 
 		try {
 			b.id().set("name1");
-			Assert.fail();
+			fail();
 		} catch (RuntimeException re) {
-			Assert.assertEquals("id is read only", re.getMessage());
+			assertEquals("id is read only", re.getMessage());
 		}
 
-		Assert.assertEquals(true, b.id().getBindingIsReadOnly());
+		assertEquals(true, b.id().getBindingIsReadOnly());
 	}
 
+	@Test
 	public void testBoolean() {
 		MethodExample e = new MethodExample("1", "name");
 		MethodExampleBinding b = new MethodExampleBinding(e);
-		Assert.assertEquals(false, b.good().get().booleanValue());
+		assertEquals(false, b.good().get().booleanValue());
 
 		b.good().set(true);
-		Assert.assertEquals(true, e.isGood());
+		assertEquals(true, e.isGood());
 	}
 
+	@Test
 	public void testToString() {
 		MethodExample e = new MethodExample("1", "name");
 		MethodExampleBinding b = new MethodExampleBinding(e);
-		Assert.assertEquals("method", b.toStringBinding().get());
+		assertEquals("method", b.toStringBinding().get());
 	}
 
+	@Test
 	public void testHasMethod() {
 		MethodExample e = new MethodExample("1", "name");
 		MethodExampleBinding b = new MethodExampleBinding(e);
-		Assert.assertEquals(false, b.stuff().get().booleanValue());
+		assertEquals(false, b.stuff().get().booleanValue());
 	}
 
+	@Test
 	public void testBooleanThatIsAKeywordFallsBackOnMethodName() {
 		MethodExample e = new MethodExample("1", "name");
 		MethodExampleBinding b = new MethodExampleBinding(e);
-		Assert.assertEquals(false, b.isNew().get().booleanValue());
+		assertEquals(false, b.isNew().get().booleanValue());
 	}
 
+	@Test
 	public void testGetBindings() {
 		MethodExample e = new MethodExample("1", "name");
 		MethodExampleBinding b = new MethodExampleBinding(e);
-		Assert.assertEquals(21, b.getChildBindings().size());
+		assertEquals(21, b.getChildBindings().size());
 
 		boolean foundName = false;
 		for (Binding<?> sub : b.getChildBindings()) {
@@ -72,21 +83,24 @@ public class MethodExampleTest extends TestCase {
 				foundName = true;
 			}
 		}
-		Assert.assertTrue(foundName);
+		assertTrue(foundName);
 	}
 
+	@Test
 	public void testList() {
 		MethodExampleBinding b = new MethodExampleBinding();
-		Assert.assertEquals(String.class, ((ContainerBinding) b.list()).getContainedType());
+		assertEquals(String.class, ((ContainerBinding) b.list()).getContainedType());
 	}
 
+	@Test
 	public void testNull() {
 		MethodExample e = new MethodExample("1", "name");
 		MethodExampleBinding b = new MethodExampleBinding(e);
-		Assert.assertEquals(false, b.isNull().get().booleanValue());
+		assertEquals(false, b.isNull().get().booleanValue());
 	}
 
 	@SuppressWarnings("unchecked")
+	@Test
 	public void testWildcards() {
 		MethodExample e = new MethodExample("1", "name");
 		@SuppressWarnings("rawtypes")
@@ -97,28 +111,32 @@ public class MethodExampleTest extends TestCase {
 		// needs casting b.wildcards().b().set("anything");
 	}
 
+	@Test
 	public void testProtected() {
 		MethodExample e = new MethodExample("1", "name");
 		MethodExampleBinding b = new MethodExampleBinding(e);
 		// was causing read only exception
 		b.protectedProperty().set(1);
-		Assert.assertEquals(2, e.protectedProperty);
+		assertEquals(2, e.protectedProperty);
 	}
 
+	@Test
 	public void testOneChar() {
 		MethodExample e = new MethodExample("1", "name");
 		MethodExampleBinding b = new MethodExampleBinding(e);
-		Assert.assertEquals(null, b.m().get());
+		assertNull(b.m().get());
 		b.m().set("onechar");
-		Assert.assertEquals("onechar", e.getM());
+		assertEquals("onechar", e.getM());
 	}
 
+	@Test
 	public void testNoArg() {
 		MethodExample e = new MethodExample("1", "name");
 		MethodExampleBinding b = new MethodExampleBinding(e);
-		Assert.assertEquals(new Integer(1), b.noArg().get());
+		assertEquals(new Integer(1), b.noArg().get());
 	}
 
+	@Test
 	public void testArray() {
 		MethodExample e = new MethodExample("1", "name");
 		MethodExampleBinding b = new MethodExampleBinding(e);
@@ -127,8 +145,8 @@ public class MethodExampleTest extends TestCase {
 		String[] arrayProp2 = { "foobar" };
 
 		e.setArrayProp(arrayProp);
-		Assert.assertArrayEquals(arrayProp, b.arrayProp().get());
+		assertArrayEquals(arrayProp, b.arrayProp().get());
 		b.arrayProp().set(arrayProp2);
-		Assert.assertArrayEquals(arrayProp2, b.arrayProp().get());
+		assertArrayEquals(arrayProp2, b.arrayProp().get());
 	}
 }

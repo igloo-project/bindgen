@@ -1,30 +1,36 @@
 package org.bindgen.example.access;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-import org.junit.Assert;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class AccessTest extends TestCase {
+public class AccessTest {
 
+	@Test
 	public void testPackageAccess() throws Exception {
 		Method m = BeanBindingPath.class.getDeclaredMethod("packageField");
-		Assert.assertEquals(false, Modifier.isPublic(m.getModifiers()));
-		Assert.assertEquals(false, Modifier.isPrivate(m.getModifiers()));
-		Assert.assertEquals(false, Modifier.isProtected(m.getModifiers()));
+		assertEquals(false, Modifier.isPublic(m.getModifiers()));
+		assertEquals(false, Modifier.isPrivate(m.getModifiers()));
+		assertEquals(false, Modifier.isProtected(m.getModifiers()));
 	}
 
+	@Test
 	public void testProtectedAccess() throws Exception {
 		Method m = BeanBindingPath.class.getDeclaredMethod("protectedField");
-		Assert.assertEquals(true, Modifier.isProtected(m.getModifiers()));
+		assertEquals(true, Modifier.isProtected(m.getModifiers()));
 	}
 
+	@Test
 	public void testPublicAccess() throws Exception {
 		Method m = BeanBindingPath.class.getDeclaredMethod("publicField");
-		Assert.assertEquals(true, Modifier.isPublic(m.getModifiers()));
+		assertEquals(true, Modifier.isPublic(m.getModifiers()));
 	}
 
+	@Test
 	public void testPrivateDoesNotGetExposed() throws Exception {
 		try {
 			BeanBindingPath.class.getDeclaredMethod("privateField");
