@@ -2,6 +2,7 @@
 
 * Java 25 (source and target) release
 * add record to bindings
+* update dependencies
 
 ## 6.0.0 (2023-08)
 
