@@ -1,12 +1,15 @@
 package org.bindgen.example.methods;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import org.bindgen.java.lang.StringBindingPath;
 
-import org.junit.Assert;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class MethodExampleStatelessTest extends TestCase {
+public class MethodExampleStatelessTest {
 
+	@Test
 	public void testReadWrite() {
 		MethodExampleBinding b = new MethodExampleBinding();
 		StringBindingPath<MethodExample, MethodExample> name = b.name();
@@ -14,25 +17,26 @@ public class MethodExampleStatelessTest extends TestCase {
 		MethodExample e1 = new MethodExample("1", "fred");
 		MethodExample e2 = new MethodExample("2", "bob");
 
-		Assert.assertEquals("fred", name.getWithRoot(e1));
-		Assert.assertEquals("bob", name.getWithRoot(e2));
+		assertEquals("fred", name.getWithRoot(e1));
+		assertEquals("bob", name.getWithRoot(e2));
 
 		name.setWithRoot(e1, "fred2");
 		name.setWithRoot(e2, "bob2");
-		Assert.assertEquals("fred2", e1.getName());
-		Assert.assertEquals("bob2", e2.getName());
+		assertEquals("fred2", e1.getName());
+		assertEquals("bob2", e2.getName());
 
 	}
 
+	@Test
 	public void testReadOnly() {
 		MethodExampleBinding b = new MethodExampleBinding();
 		MethodExample e1 = new MethodExample("1", "fred");
 
 		try {
 			b.id().setWithRoot(e1, "name1");
-			Assert.fail();
+			fail();
 		} catch (RuntimeException re) {
-			Assert.assertEquals("id is read only", re.getMessage());
+			assertEquals("id is read only", re.getMessage());
 		}
 	}
 

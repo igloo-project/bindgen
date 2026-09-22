@@ -1,55 +1,60 @@
 package org.bindgen.example;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+
 import org.bindgen.example.Parents.Foo;
 import org.bindgen.example.Parents.FooChild;
 import org.bindgen.example.parents.FooBinding;
 import org.bindgen.example.parents.FooChildBinding;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Assert;
-import junit.framework.TestCase;
+public class ParentBindingTest {
 
-public class ParentBindingTest extends TestCase {
-
+	@Test
 	public void testParentBindingIsNullByDefault() {
 		FooBinding b = new FooBinding();
-		Assert.assertEquals(null, b.getParentBinding());
+		assertNull(b.getParentBinding());
 	}
 
+	@Test
 	public void testParentBindingOfFieldProperty() {
 		FooBinding b = new FooBinding();
-		Assert.assertSame(b, b.bar().getParentBinding());
+		assertSame(b, b.bar().getParentBinding());
 	}
 
+	@Test
 	public void testParentBindingOfMethodProperty() {
 		FooBinding b = new FooBinding();
-		Assert.assertSame(b, b.baz().getParentBinding());
+		assertSame(b, b.baz().getParentBinding());
 	}
 
 	@Test
 	public void testToString() {
 		FooChildBinding fcb = new FooChildBinding();
-		Assert.assertEquals("FooChildBinding(null)", fcb.toString());
-		Assert.assertEquals("FooChildBinding(null).foo()", fcb.foo().toString());
-		Assert.assertEquals("FooChildBinding(null).foo().baz()", fcb.foo().baz().toString());
+		assertEquals("FooChildBinding(null)", fcb.toString());
+		assertEquals("FooChildBinding(null).foo()", fcb.foo().toString());
+		assertEquals("FooChildBinding(null).foo().baz()", fcb.foo().baz().toString());
 
 		// Now set FooChild
 		fcb.set(new FooChild());
-		Assert.assertEquals("FooChildBinding(child)", fcb.toString());
-		Assert.assertEquals("FooChildBinding(child).foo(null)", fcb.foo().toString());
-		Assert.assertEquals("FooChildBinding(child).foo(null).baz()", fcb.foo().baz().toString());
+		assertEquals("FooChildBinding(child)", fcb.toString());
+		assertEquals("FooChildBinding(child).foo(null)", fcb.foo().toString());
+		assertEquals("FooChildBinding(child).foo(null).baz()", fcb.foo().baz().toString());
 
 		// No set Foo
 		fcb.get().foo = new Foo();
-		Assert.assertEquals("FooChildBinding(child)", fcb.toString());
-		Assert.assertEquals("FooChildBinding(child).foo(foo)", fcb.foo().toString());
-		Assert.assertEquals("FooChildBinding(child).foo(foo).baz(baz)", fcb.foo().baz().toString());
+		assertEquals("FooChildBinding(child)", fcb.toString());
+		assertEquals("FooChildBinding(child).foo(foo)", fcb.foo().toString());
+		assertEquals("FooChildBinding(child).foo(foo).baz(baz)", fcb.foo().baz().toString());
 	}
 
+	@Test
 	public void testGetPath() {
 		FooChildBinding fcb = new FooChildBinding();
-		Assert.assertEquals("#root", fcb.getPath());
-		Assert.assertEquals("foo", fcb.foo().getPath());
-		Assert.assertEquals("foo.baz", fcb.foo().baz().getPath());
+		assertEquals("#root", fcb.getPath());
+		assertEquals("foo", fcb.foo().getPath());
+		assertEquals("foo.baz", fcb.foo().baz().getPath());
 	}
 }

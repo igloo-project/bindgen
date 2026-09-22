@@ -1,16 +1,18 @@
 package org.bindgen.example.inheritance4;
 
-import org.junit.Assert;
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class BindingTest extends TestCase {
+import org.junit.jupiter.api.Test;
 
+public class BindingTest {
+
+	@Test
 	public void testInheritedBinding() {
 		ChildBinding b = new ChildBinding(new ChildImpl());
 		b.childField().set("string1");
 		b.parentField().set("string2");
-		Assert.assertEquals("string1", b.childField().get());
-		Assert.assertEquals("string2", b.parentField().get());
+		assertEquals("string1", b.childField().get());
+		assertEquals("string2", b.parentField().get());
 	}
 
 	private static class ChildImpl implements Child {

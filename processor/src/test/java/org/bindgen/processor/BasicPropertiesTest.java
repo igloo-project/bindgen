@@ -1,10 +1,11 @@
 package org.bindgen.processor;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.bindgen.Binding;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class BasicPropertiesTest extends AbstractBindgenTestCase {
 	private static final String NAME = "John Doe";
@@ -26,7 +27,7 @@ public class BasicPropertiesTest extends AbstractBindgenTestCase {
 		Class<?> addressClass = loader.loadClass(name("Address"));
 		Class<?> addressBindingClass = loader.loadClass(name("AddressBinding"));
 
-		Object address = addressClass.newInstance();
+		Object address = addressClass.getDeclaredConstructor().newInstance();
 
 		addressClass.getField("city").set(address, CITY);
 
@@ -36,7 +37,7 @@ public class BasicPropertiesTest extends AbstractBindgenTestCase {
 		Object cityBinding = addressBindingClass.getMethod("city").invoke(binding);
 		String city = (String) Binding.class.getMethod("get").invoke(cityBinding);
 
-		assertThat(CITY, is(city));
+		assertEquals(CITY, city);
 	}
 
 	@Test
@@ -52,10 +53,10 @@ public class BasicPropertiesTest extends AbstractBindgenTestCase {
 
 		Class<?> personBindingClass = loader.loadClass(name("PersonBinding"));
 
-		Object address = addressClass.newInstance();
+		Object address = addressClass.getDeclaredConstructor().newInstance();
 		addressClass.getField("city").set(address, CITY);
 
-		Object person = personClass.newInstance();
+		Object person = personClass.getDeclaredConstructor().newInstance();
 		personClass.getField("name").set(person, NAME);
 		personClass.getField("address").set(person, address);
 
@@ -65,8 +66,8 @@ public class BasicPropertiesTest extends AbstractBindgenTestCase {
 		Object addressBinding = personBindingClass.getMethod("address").invoke(binding);
 		Object cityBinding = addressBindingPathClass.getMethod("city").invoke(addressBinding);
 		String city = (String) Binding.class.getMethod("get").invoke(cityBinding);
-
-		assertThat(CITY, is(city));
+    
+    assertEquals(CITY, city);
 	}
 
 	@Test

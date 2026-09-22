@@ -1,9 +1,11 @@
 package org.bindgen.processor;
 
-import static org.junit.Assert.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.bindgen.Binding;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class NoArgMethodBindingTest extends AbstractBindgenTestCase {
 
@@ -64,7 +66,7 @@ public class NoArgMethodBindingTest extends AbstractBindgenTestCase {
 		Class<?> testedClass = loader.loadClass(testedClassName);
 
 		assertChildBindings(bindingClass, "foo", "foofoo", "hashCodeBinding", "toStringBinding");
-		Object testObj = testedClass.newInstance();
+		Object testObj = testedClass.getDeclaredConstructor().newInstance();
 		@SuppressWarnings("unchecked")
 		Binding<Object> bindingObj = (Binding<Object>) bindingClass.getConstructor(testedClass).newInstance(testObj);
 		Object fooBinding = bindingClass.getMethod("foo").invoke(bindingObj);
@@ -73,14 +75,14 @@ public class NoArgMethodBindingTest extends AbstractBindgenTestCase {
 		testedClass.getMethod("foo", Integer.class).invoke(testObj, 5);
 		assertEquals(testObj, testedClass.getMethod("foofoo", Integer.class).invoke(testObj, 55));
 
-		assertEquals(Integer.valueOf(5), Binding.class.getMethod("get").invoke(fooBinding));
-		assertEquals(Integer.valueOf(55), Binding.class.getMethod("get").invoke(foofooBinding));
+		assertEquals(5, Binding.class.getMethod("get").invoke(fooBinding));
+		assertEquals(55, Binding.class.getMethod("get").invoke(foofooBinding));
 
 		Binding.class.getMethod("set", Object.class).invoke(fooBinding, 7);
 		Binding.class.getMethod("set", Object.class).invoke(foofooBinding, 77);
 
-		assertEquals(Integer.valueOf(7), Binding.class.getMethod("get").invoke(fooBinding));
-		assertEquals(Integer.valueOf(77), Binding.class.getMethod("get").invoke(foofooBinding));
+		assertEquals(7, Binding.class.getMethod("get").invoke(fooBinding));
+		assertEquals(77, Binding.class.getMethod("get").invoke(foofooBinding));
 
 	}
 }

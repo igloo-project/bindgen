@@ -1,6 +1,6 @@
 package org.bindgen.processor;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /** Tests without a scope to generate bindings for the java.* packages. */
 public class NoScopeTest extends AbstractBindgenTestCase {

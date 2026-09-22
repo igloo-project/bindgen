@@ -1,6 +1,8 @@
 package org.bindgen.processor;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,8 +26,8 @@ import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
 import org.bindgen.Binding;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 
 import joist.util.Join;
 
@@ -37,7 +39,7 @@ public class AbstractBindgenTestCase {
 	private final HashMap<String, String> aptProperties = new HashMap<String, String>();
 	private final File output = new File(outputRoot, String.valueOf(testNumber++));
 
-	@BeforeClass
+	@BeforeAll
 	public static void resetBase() {
 		if (outputRoot.exists() && !recursiveDelete(outputRoot)) {
 			System.err.println("Cannot delete " + outputRoot);
@@ -45,7 +47,7 @@ public class AbstractBindgenTestCase {
 		outputRoot.mkdirs();
 	}
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		this.output.mkdirs();
 		this.setScope("org.bindgen,java.lang");
@@ -147,7 +149,7 @@ public class AbstractBindgenTestCase {
 		List<String> expectedChildNames = Arrays.asList(expectedChildNamesArray);
 		List<String> actualChildNames = new ArrayList<String>();
 
-		Binding<?> binding = (Binding<?>) bindingClass.newInstance();
+		Binding<?> binding = (Binding<?>) bindingClass.getDeclaredConstructor().newInstance();
 		for (Binding<?> child : binding.getChildBindings()) {
 			actualChildNames.add(child.getName());
 		}

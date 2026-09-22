@@ -1,21 +1,22 @@
 package org.bindgen.processor.generators;
 
-import org.junit.Assert;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class AccessorPrefixTest {
 
 	@Test
 	public void testMatches() {
-		Assert.assertEquals(true, AccessorPrefix.GET.matches("getFoo"));
-		Assert.assertEquals(false, AccessorPrefix.GET.matches("getfoo"));
-		Assert.assertEquals(false, AccessorPrefix.GET.matches("foo"));
-
-		Assert.assertEquals(true, AccessorPrefix.NONE.matches("foo"));
-		Assert.assertEquals(false, AccessorPrefix.NONE.matches("getFoo"));
-		Assert.assertEquals(false, AccessorPrefix.NONE.matches("isFoo"));
-		Assert.assertEquals(false, AccessorPrefix.NONE.matches("hasFoo"));
+    assertTrue(AccessorPrefix.GET.matches("getFoo"));
+    assertFalse(AccessorPrefix.GET.matches("getfoo"));
+    assertFalse(AccessorPrefix.GET.matches("foo"));
+    
+    assertTrue(AccessorPrefix.NONE.matches("foo"));
+    assertFalse(AccessorPrefix.NONE.matches("getFoo"));
+    assertFalse(AccessorPrefix.NONE.matches("isFoo"));
+    assertFalse(AccessorPrefix.NONE.matches("hasFoo"));
 	}
 
 }

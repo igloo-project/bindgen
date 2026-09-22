@@ -1,9 +1,12 @@
 package org.bindgen.example.access;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class BindingClashesTest extends TestCase {
+import org.junit.jupiter.api.Test;
 
+public class BindingClashesTest {
+
+	@Test
 	public void testType() {
 		BindingClashes c = new BindingClashes();
 		BindingClashesBinding b = new BindingClashesBinding(c);
@@ -15,6 +18,7 @@ public class BindingClashesTest extends TestCase {
 		assertEquals(String.class, b.property().getType());
 	}
 
+	@Test
 	public void testPath() {
 		BindingClashes c = new BindingClashes();
 		BindingClashesBinding b = new BindingClashesBinding(c);

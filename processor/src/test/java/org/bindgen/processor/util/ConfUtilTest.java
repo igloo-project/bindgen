@@ -1,7 +1,6 @@
 package org.bindgen.processor.util;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
@@ -9,6 +8,8 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Nándor Előd Fekete
@@ -19,7 +20,7 @@ public class ConfUtilTest {
 	public void testRelativePathParents() {
 		final Path testPath = Paths.get("a", "b", "dummy.txt");
 		final List<Path> result = ConfUtil.pathWithParents(testPath).collect(Collectors.toList());
-		Assert.assertEquals(
+		assertEquals(
 			Arrays.asList(
 				testPath,
 				testPath.getParent(),
@@ -40,7 +41,7 @@ public class ConfUtilTest {
 		final Path rootDirectory = rootDirectories.iterator().next();
 		final Path testPath = rootDirectory.resolve(Paths.get("a", "b", "dummy.txt"));
 		final List<Path> result = ConfUtil.pathWithParents(testPath).collect(Collectors.toList());
-		Assert.assertEquals(
+		assertEquals(
 			Arrays.asList(
 				rootDirectory.resolve(Paths.get("a", "b", "dummy.txt")),
 				rootDirectory.resolve(Paths.get("a", "b")),

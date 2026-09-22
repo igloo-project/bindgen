@@ -1,29 +1,34 @@
 package org.bindgen.example.blocks;
 
-import org.junit.Assert;
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
 
 import org.bindgen.NamedBinding;
 
-public class RunnableExampleTest extends TestCase {
+public class RunnableExampleTest {
 
+	@Test
 	public void testRun() {
 		RunnableExample e = new RunnableExample();
-		Assert.assertFalse(e.isStuffDone());
+		assertFalse(e.isStuffDone());
 
 		RunnableExampleBinding b = new RunnableExampleBinding(e);
 		Runnable r = b.doStuff();
-		Assert.assertFalse(e.isStuffDone());
+		assertFalse(e.isStuffDone());
 
 		r.run();
-		Assert.assertTrue(e.isStuffDone());
+		assertTrue(e.isStuffDone());
 	}
 
+	@Test
 	public void testRunName() {
 		RunnableExample e = new RunnableExample();
 		RunnableExampleBinding b = new RunnableExampleBinding(e);
 		Runnable r = b.doStuff();
-		Assert.assertEquals("doStuff", ((NamedBinding) r).getName());
+		assertEquals("doStuff", ((NamedBinding) r).getName());
 	}
 
 }

@@ -1,12 +1,14 @@
-import org.junit.Assert;
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ClassInDefaultPackageTest extends TestCase {
+import org.junit.jupiter.api.Test;
+
+public class ClassInDefaultPackageTest {
+	@Test
 	public void testClass() {
 		ClassInDefaultPackage c = new ClassInDefaultPackage();
 		ClassInDefaultPackageBinding b = new ClassInDefaultPackageBinding(c);
 		b.name().set("c");
-		Assert.assertEquals("c", c.name);
+		assertEquals("c", c.name);
 	}
 
 }

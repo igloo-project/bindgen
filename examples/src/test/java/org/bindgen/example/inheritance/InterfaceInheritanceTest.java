@@ -1,16 +1,18 @@
 package org.bindgen.example.inheritance;
 
-import org.junit.Assert;
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class InterfaceInheritanceTest extends TestCase {
+import org.junit.jupiter.api.Test;
 
+public class InterfaceInheritanceTest {
+
+	@Test
 	public void testA() {
 		InterfaceBBinding b = new InterfaceBBinding();
 		b.set(new InterfaceBImpl());
-		Assert.assertEquals("a", b.fromA().get());
-		Assert.assertEquals("aa", b.fromAA().get());
-		Assert.assertEquals("b", b.fromB().get());
+		assertEquals("a", b.fromA().get());
+		assertEquals("aa", b.fromAA().get());
+		assertEquals("b", b.fromB().get());
 	}
 
 }

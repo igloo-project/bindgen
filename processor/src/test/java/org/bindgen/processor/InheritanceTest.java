@@ -1,7 +1,9 @@
 package org.bindgen.processor;
 
-import org.junit.Assert;
-import org.junit.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 /** Tests a child class inheritance a generic getter/setter. */
 public class InheritanceTest extends AbstractBindgenTestCase {
@@ -15,7 +17,7 @@ public class InheritanceTest extends AbstractBindgenTestCase {
 		Class<?> cbClass = cl.loadClass("org.bindgen.processor.inheritance.ChildBinding");
 		assertChildBindings(cbClass, "hashCodeBinding", "list", "toStringBinding", "value", "valueField");
 
-		Object child = cClass.newInstance();
+		Object child = cClass.getDeclaredConstructor().newInstance();
 		Object childBinding = cbClass.getConstructor(cClass).newInstance(child);
 		Object valueBinding = cbClass.getMethod("value").invoke(childBinding);
 		Object valueFieldBinding = cbClass.getMethod("valueField").invoke(childBinding);
@@ -23,17 +25,17 @@ public class InheritanceTest extends AbstractBindgenTestCase {
 		// set via the binding
 		valueBinding.getClass().getMethod("set", Object.class).invoke(valueBinding, "FOO");
 		// get via the class
-		Assert.assertEquals("FOO", cClass.getMethod("value").invoke(child));
+		assertEquals("FOO", cClass.getMethod("value").invoke(child));
 
 		// set via the class
 		cClass.getMethod("value", Object.class).invoke(child, "BAR");
 		// get via the binding
-		Assert.assertEquals("BAR", valueBinding.getClass().getMethod("get").invoke(valueBinding));
+		assertEquals("BAR", valueBinding.getClass().getMethod("get").invoke(valueBinding));
 
 		// set via the field binding
 		valueFieldBinding.getClass().getMethod("set", Object.class).invoke(valueFieldBinding, "ZAZ");
 		// get via the field binding
-		Assert.assertEquals("ZAZ", valueFieldBinding.getClass().getMethod("get").invoke(valueFieldBinding));
+		assertEquals("ZAZ", valueFieldBinding.getClass().getMethod("get").invoke(valueFieldBinding));
 	}
 
 }

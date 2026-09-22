@@ -1,3 +1,8 @@
+## 7.0.0 (2023-08)
+
+* Java 25 (source and target) release
+* add record to bindings
+
 ## 6.0.0 (2023-08)
 
 * Java 17 (source and target) release
